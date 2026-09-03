@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据分析工作台 · 导航</title>
+<style>
+:root{
+  --bg:#F4F6FB;
+  --surface:#FFFFFF;
+  --border:#E8ECF4;
+  --text:#0F172A;
+  --text-2:#475569;
+  --text-3:#94A3B8;
+  --brand:#4F46E5;
+  --brand-2:#6366F1;
+  --income:#059669;
+  --expense:#E11D48;
+  --warn:#D97706;
+  --r-card:24px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04),0 3px 10px rgba(15,23,42,.05);
+  --shadow:0 10px 30px rgba(15,23,42,.08),0 2px 8px rgba(15,23,42,.05);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html[data-theme="dark"]{
+  --bg:#0B0E16; --surface:#151927; --border:#2A3142;
+  --text:#EEF1F8; --text-2:#A7B0C4; --text-3:#7A839B;
+  --brand:#8B93FF; --brand-2:#A5AEFF;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow:0 12px 34px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 620px at 4% -12%, #EAEEFF 0%, rgba(234,238,255,0) 52%),
+    radial-gradient(1000px 560px at 104% -8%, #E7FAF1 0%, rgba(231,250,241,0) 50%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  min-height:100vh;
+}
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(1200px 620px at 4% -12%, #1A2348 0%, rgba(26,35,72,0) 52%),
+    radial-gradient(1000px 560px at 104% -8%, #10301F 0%, rgba(16,48,31,0) 50%),
+    var(--bg);
+}
+.wrap{width:100%;max-width:1360px;margin:0 auto;padding:clamp(24px,3.2vw,48px) clamp(16px,3vw,44px) clamp(40px,5vw,72px)}
+/* 页头 */
+.head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.logo{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 10px 24px rgba(79,70,229,.32);flex:none}
+.logo svg{width:30px;height:30px;color:#fff}
+.head h1{margin:0;font-size:clamp(21px,2.2vw,27px);font-weight:800;letter-spacing:.5px}
+.head .sub{margin-top:5px;color:var(--text-3);font-size:13.5px;letter-spacing:1px}
+.lead{color:var(--text-2);font-size:14.5px;margin:18px 2px 26px;line-height:1.7}
+/* 大屏主推卡 */
+.screen-card{display:flex;align-items:center;gap:20px;text-decoration:none;color:#EAF2FF;
+  border-radius:var(--r-card);padding:clamp(20px,2.2vw,28px) clamp(22px,2.4vw,30px);margin-bottom:22px;position:relative;overflow:hidden;
+  background:linear-gradient(120deg,#0B1B3F 0%,#132A63 48%,#0E3B47 100%);
+  box-shadow:0 18px 46px rgba(11,27,63,.4);border:1px solid rgba(120,170,255,.28);
+  transition:transform .28s var(--ease),box-shadow .28s var(--ease)}
+.screen-card:hover{transform:translateY(-3px);box-shadow:0 26px 60px rgba(11,27,63,.5)}
+.screen-card .sc-ic{width:64px;height:64px;border-radius:18px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:rgba(34,211,238,.16);border:1px solid rgba(34,211,238,.4);box-shadow:0 0 26px rgba(34,211,238,.35)}
+.screen-card .sc-ic svg{width:34px;height:34px;color:#67E8F9}
+.screen-card .sc-tx{flex:1;min-width:0}
+.screen-card .sc-t{font-size:clamp(18px,1.8vw,21px);font-weight:800;letter-spacing:2px}
+.screen-card .sc-d{font-size:13.5px;color:#9FB8E6;margin-top:6px;line-height:1.6}
+.screen-card .sc-go{font-size:13px;color:#67E8F9;display:flex;align-items:center;gap:6px;flex:none}
+.screen-card .sc-go svg{width:16px;height:16px}
+/* 模块卡片网格 */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{display:flex;align-items:flex-start;gap:16px;text-decoration:none;color:inherit;position:relative;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:clamp(18px,1.8vw,24px);box-shadow:var(--shadow-sm);
+  transition:transform .26s var(--ease),box-shadow .26s var(--ease),border-color .26s var(--ease)}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--brand) 40%,var(--border))}
+.card .ic{width:50px;height:50px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center}
+.card .ic svg{width:26px;height:26px}
+.ic.brand{background:color-mix(in srgb,var(--brand) 13%,transparent);color:var(--brand)}
+.ic.green{background:rgba(5,150,105,.12);color:var(--income)}
+.ic.gold{background:rgba(217,119,6,.13);color:var(--warn)}
+.ic.red{background:rgba(225,29,72,.1);color:var(--expense)}
+.card .tx{flex:1;min-width:0}
+.card .t{font-size:17px;font-weight:700;display:flex;align-items:center;gap:9px}
+.card .d{font-size:13px;color:var(--text-3);margin-top:7px;line-height:1.6}
+.card .go{color:var(--text-3);flex:none;margin-top:2px;transition:transform .2s var(--ease),color .2s}
+.card:hover .go{color:var(--brand);transform:translateX(3px)}
+.card .go svg{width:18px;height:18px}
+/* 实时角标 */
+.badge{min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--expense);color:#fff;
+  font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 8px rgba(225,29,72,.4);font-variant-numeric:tabular-nums;line-height:1}
+.badge.b-ap{background:var(--warn);box-shadow:0 3px 8px rgba(217,119,6,.4)}
+.badge[hidden]{display:none}
+.foot{margin-top:30px;text-align:center;color:var(--text-3);font-size:12.5px;line-height:1.8}
+@media (min-width:1100px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:720px){
+  .grid{grid-template-columns:1fr}
+  .head h1{font-size:21px}
+  .screen-card{flex-wrap:wrap;padding:22px}
+  .screen-card .sc-go{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <span class="logo"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 13h4v7H4z"/><path d="M10 6h4v14h-4z"/><path d="M16 10h4v10h-4z"/><path d="M3 20h18"/></svg></span>
+    <div>
+      <h1>数据分析工作台</h1>
+      <div class="sub">门店收支 · 工资台账 · 报销审批 · 一体化录入与可视化</div>
+    </div>
+  </div>
+
+  <p class="lead">选择要进入的功能模块。每个模块都是独立页面，数据统一来自资料库，多端实时同步；卡片右上角会实时提示「待我审批 / 今日待办」数量。</p>
+
+  <a class="screen-card" href="/screen/">
+    <span class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14v3M12 9v8M17 5v12"/></svg></span>
+    <span class="sc-tx">
+      <div class="sc-t">数 据 大 屏</div>
+      <div class="sc-d">深色科技风全屏看板，聚合门店收支核心指标、月度趋势、渠道分布与净结余，支持一键全屏，适合投屏与远距离总览（不含工资等涉密数据）。</div>
+    </span>
+    <span class="sc-go">进入大屏 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </a>
+
+  <div class="grid">
+    <a class="card" href="/ledger/">
+      <span class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>
+      <span class="tx">
+        <div class="t">鼎知堂</div>
+        <div class="d">门店收支流水：收支录入、月度收支对比、渠道分布、支出分类榜，支持按年份/月份/类型/渠道筛选与批量管理。</div>
+      </span>
+      <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+
+    <a class="card" href="/salary/">
+      <span class="ic brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H7"/></svg></span>
+      <span class="tx">
+        <div class="t">工资台账</div>
+        <div class="d">工资记录与发放管理：应发/已发/未发、发放率、月度趋势与发放结构，金额隐私门保护，支持录入与批量管理。</div>
+      </span>
+      <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+
+    <a class="card" href="/pending/">
+      <span class="ic gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+      <span class="tx">
+        <div class="t">待处理 <span class="badge" id="badge-todo" hidden>0</span></div>
+        <div class="d">今天要处理的事项汇总：待复核流水、待结清、待录入等自动归集，逾期标红，一键直达处理（涉密内容进入后解密查看）。</div>
+      </span>
+      <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+
+    <a class="card" href="/approval/">
+      <span class="ic red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span>
+      <span class="tx">
+        <div class="t">报销审批 <span class="badge b-ap" id="badge-approval" hidden>0</span></div>
+        <div class="d">发起报销 → 指定审批人 → 多级（二次）审核 → 全程留痕。账号由管理员统一开通，角色含发起人/审批人。</div>
+      </span>
+      <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+    </a>
+  </div>
+
+  <div class="foot">
+    数据分析工作台 · 模块化独立页面 · 数据统一存储于资料库并实时同步<br>
+    工资表 / 门店收支流水表云端保存，建议定期在各模块页使用「导出 JSON」做本地快照备份
+  </div>
+</div>
+<script>
+/* 主题随系统/工作台偏好（浅色为主，深色自适应） */
+try{
+  var saved=localStorage.getItem('wb_dataws_theme');
+  var dark=saved? saved==='dark' : window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(dark) document.documentElement.setAttribute('data-theme','dark');
+}catch(e){}
+
+/* ===== 实时角标 ===== */
+var DB_LEDGER='VhotoVgDEpeywLkYTiKoeW';
+function num(v){ var n=parseFloat(v); return isFinite(n)?n:0; }
+function monthKey(v){ return String(v==null?'':v).slice(0,7); }
+function setBadge(id,n){
+  var el=document.getElementById(id); if(!el) return;
+  if(n>0){ el.hidden=false; el.textContent=n>99?'99+':String(n); }
+  else { el.hidden=true; }
+}
+/* 待我审批：本地审批单 + 当前登录会话；未登录或无待审为 0 */
+function countMyApprovals(){
+  try{
+    var users=JSON.parse(localStorage.getItem('wb_dataws_users')||'[]');
+    var sess=localStorage.getItem('wb_dataws_session');
+    var apps=JSON.parse(localStorage.getItem('wb_dataws_approvals')||'[]');
+    if(!Array.isArray(users)||!Array.isArray(apps)||!sess) return 0;
+    var me=users.filter(function(u){return String(u.id)===String(sess);})[0];
+    if(!me) return 0;
+    var name=me.name, n=0;
+    apps.forEach(function(a){
+      if(a.status!=='pending'||!Array.isArray(a.chain)) return;
+      var step=a.chain[a.level||0];
+      if(step && step.status==='pending' && step.name===name) n++;
+    });
+    return n;
+  }catch(e){ return 0; }
+}
+/* 今日待办（非涉密口径）：截图识别流水待复核笔数 + 本月无流水提醒；工资类涉密项不计入首页 */
+var TOKEN_KEY = 'cf_ws_token';
+function getToken(){ try{ return sessionStorage.getItem(TOKEN_KEY) || ''; }catch(e){ return ''; } }
+function apiCall(path){
+  var t = getToken();
+  var h = { 'Content-Type': 'application/json' };
+  if(t) h['Authorization'] = 'Bearer ' + t;
+  return fetch(path, { headers: h }).then(function(r){ return r.json(); }).catch(function(){ return { httpOk: false }; });
+}
+function countTodos(){
+  apiCall('/api/ledger').then(function(resp){
+    if(!resp.httpOk){ setBadge('badge-todo',0); return; }
+    var rows = resp.data || [];
+    var tm=(new Date()).toISOString().slice(0,7);
+    var ocr=rows.filter(function(r){return r['数据来源']==='截图识别';}).length;
+    var hasMonth=rows.some(function(r){return (r['交易时间']||'').slice(0,7)===tm;});
+    setBadge('badge-todo', ocr + (hasMonth?0:1));
+  }).catch(function(){ setBadge('badge-todo',0); });
+}
+setBadge('badge-approval', countMyApprovals());
+countTodos();
+</script>
+</body>
+</html>

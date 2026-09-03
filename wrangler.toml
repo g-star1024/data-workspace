@@ -1,0 +1,6 @@
+name = "数据工作台"
+pages_build_output_dir = "pages"
+compatibility_date = "2026-05-01"
+
+[vars]
+ENV = "production"

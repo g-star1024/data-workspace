@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据大屏 · 鼎知堂经营总览</title>
+<style>
+:root{
+  --bg:#05070F;
+  --panel:rgba(13,20,38,.72);
+  --line:rgba(86,140,255,.22);
+  --txt:#E8F0FF;
+  --txt-2:#8FA6CF;
+  --txt-3:#5E7199;
+  --cyan:#22D3EE;
+  --blue:#5B8CFF;
+  --green:#34D399;
+  --red:#FB7185;
+  --gold:#FBBF24;
+  --purple:#A78BFA;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1400px 700px at 12% -10%, rgba(34,211,238,.14), transparent 55%),
+    radial-gradient(1300px 680px at 102% 4%, rgba(91,140,255,.18), transparent 52%),
+    radial-gradient(1000px 600px at 50% 120%, rgba(167,139,250,.12), transparent 55%),
+    var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  min-height:100vh;
+  padding:clamp(12px,1.6vw,26px) clamp(14px,2vw,34px) clamp(18px,2.2vw,34px);
+}
+.screen{width:100%;max-width:none;margin:0 auto;min-height:calc(100vh - 40px);display:flex;flex-direction:column}
+/* ===== 顶栏 ===== */
+.top{display:flex;align-items:center;gap:18px;padding:4px 4px 14px}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));box-shadow:0 0 24px rgba(34,211,238,.45);flex:none}
+.logo svg{width:26px;height:26px;color:#04101F}
+.tt{line-height:1.15}
+.tt .t1{font-size:clamp(19px,1.8vw,26px);font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,#fff,#9fd8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tt .t2{font-size:12.5px;color:var(--txt-2);letter-spacing:3px;margin-top:3px}
+.top .sp{flex:1}
+.clock{text-align:right}
+.clock .tm{font-size:clamp(18px,1.9vw,27px);font-weight:800;font-variant-numeric:tabular-nums;color:#BFE6FF;letter-spacing:1px}
+.clock .dt{font-size:12.5px;color:var(--txt-2);margin-top:2px}
+.fs-btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:11px;
+  padding:9px 15px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;flex:none}
+.fs-btn:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(34,211,238,.35)}
+.fs-btn svg{width:15px;height:15px}
+/* ===== KPI 行（铺满） ===== */
+.kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:clamp(10px,1vw,16px);margin-bottom:clamp(12px,1.1vw,18px)}
+.kpi{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(12px,1.1vw,17px) clamp(13px,1.1vw,18px);overflow:hidden;backdrop-filter:blur(6px)}
+.kpi::before{content:"";position:absolute;left:0;top:0;width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--kc,var(--cyan)),transparent)}
+.kpi .lab{font-size:clamp(11px,.85vw,13px);color:var(--txt-2);letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.kpi .val{font-size:clamp(19px,1.9vw,31px);font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums;
+  color:var(--kc,#E8F0FF);text-shadow:0 0 18px var(--kglow,rgba(34,211,238,.35));white-space:nowrap}
+.kpi .sub{font-size:clamp(10px,.75vw,11.5px);color:var(--txt-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ===== 图表网格（铺满） ===== */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(10px,1vw,16px);flex:1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:clamp(13px,1.2vw,18px) clamp(15px,1.3vw,20px);backdrop-filter:blur(6px);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.panel .ph{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.panel .ph .ti{font-size:clamp(13px,1.05vw,16px);font-weight:700;letter-spacing:1px;color:#DCEBFF;display:flex;align-items:center;gap:8px}
+.panel .ph .ti::before{content:"";width:4px;height:15px;border-radius:2px;background:linear-gradient(var(--cyan),var(--blue));display:inline-block}
+.panel .ph .ts{font-size:11.5px;color:var(--txt-3)}
+.panel .body{flex:1;display:flex;flex-direction:column;justify-content:center}
+.span7{grid-column:span 7}.span5{grid-column:span 5}.span6{grid-column:span 6}.span12{grid-column:span 12}
+.panel svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--txt-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.empty{color:var(--txt-3);text-align:center;padding:50px 0;font-size:14px}
+.status-line{font-size:12px;color:var(--txt-3);text-align:center;padding:10px 0 0}
+@media (max-width:1280px){
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .span7,.span5,.span6{grid-column:span 12}
+}
+@media (max-width:640px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .tt .t2{display:none}
+}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="top">
+    <div class="brand">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/></svg></span>
+      <span class="tt">
+        <div class="t1">数 据 大 屏</div>
+        <div class="t2">鼎知堂 · 门店经营总览</div>
+      </span>
+    </div>
+    <div class="sp"></div>
+    <div class="clock"><div class="tm" id="clk-time">--:--:--</div><div class="dt" id="clk-date">----</div></div>
+    <button class="fs-btn" id="btn-fs" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      <span id="fs-label">全屏</span>
+    </button>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="panel span7">
+      <div class="ph"><span class="ti">月度收支对比</span><span class="ts" id="led-trend-sub">收入与支出分组对比</span></div>
+      <div class="body" id="led-trend"></div>
+      <div class="legend"><span><i style="background:var(--green)"></i>收入</span><span><i style="background:var(--red)"></i>支出</span></div>
+    </div>
+    <div class="panel span5">
+      <div class="ph"><span class="ti">收入渠道分布</span><span class="ts">按收入金额占比</span></div>
+      <div class="body" id="led-pie"></div>
+      <div class="legend" id="led-pie-legend"></div>
+    </div>
+
+    <div class="panel span7">
+      <div class="ph"><span class="ti">月度净结余趋势</span><span class="ts" id="led-net-sub">收入减支出，正为盈余</span></div>
+      <div class="body" id="led-net"></div>
+      <div class="legend"><span><i style="background:var(--cyan)"></i>净结余（盈余）</span><span><i style="background:var(--red)"></i>净赤字</span></div>
+    </div>
+    <div class="panel span5">
+      <div class="ph"><span class="ti">支出分类榜</span><span class="ts">按支出金额降序</span></div>
+      <div class="body" id="led-catbar"></div>
+    </div>
+  </div>
+  <div class="status-line" id="status-line">正在连接资料库…</div>
+</div>
+
+<script>
+/* 数据大屏仅读取门店收支流水表（不含工资等涉密数据）。 */
+var DB_LEDGER = 'VhotoVgDEpeywLkYTiKoeW';
+var CHANNEL_COLOR = {'微信':'#34D399','支付宝':'#5B8CFF','现金':'#FBBF24','银行卡':'#A78BFA','其他':'#8FA6CF'};
+
+function num(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
+function fmtWan(v){
+  var n = num(v); var abs = Math.abs(n);
+  var s;
+  if(abs >= 10000){ s = (n/10000).toFixed(abs>=1000000?0:2).replace(/\.?0+$/,'') + '万'; }
+  else { s = n.toFixed(0); }
+  return '¥' + s;
+}
+function fmtFull(v){
+  var n = num(v), s = Math.abs(n).toFixed(2).split('.');
+  s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return (n<0?'-¥':'¥') + s.join('.');
+}
+function monthKey(v){ return String(v==null?'':v).slice(0,7); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var TOKEN_KEY = 'cf_ws_token';
+function getToken(){ try{ return sessionStorage.getItem(TOKEN_KEY) || ''; }catch(e){ return ''; } }
+function apiCall(path){
+  var t = getToken();
+  var h = { 'Content-Type': 'application/json' };
+  if(t) h['Authorization'] = 'Bearer ' + t;
+  return fetch(path, { headers: h }).then(function(r){ return r.json(); }).catch(function(){ return { httpOk: false }; });
+}
+function loadData(){
+  return apiCall('/api/ledger').then(function(resp){
+    return { ledger: resp.httpOk ? (resp.data || []) : [] };
+  });
+}
+
+/* ===== 聚合（仅收支流水） ===== */
+function aggLedger(rows){
+  var a={income:0,expense:0,net:0,inCnt:0,outCnt:0,byChannel:{},byCategory:{},byMonth:{},wx:0};
+  rows.forEach(function(r){
+    var amt=num(r['金额']), isIn=r['收支类型']==='收入';
+    if(isIn){ a.income+=amt; a.inCnt++; } else { a.expense+=amt; a.outCnt++; }
+    var mk=monthKey(r['交易时间']);
+    if(!a.byMonth[mk]) a.byMonth[mk]={month:mk,income:0,expense:0,inCnt:0,outCnt:0};
+    if(isIn){ a.byMonth[mk].income+=amt; a.byMonth[mk].inCnt++; }
+    else { a.byMonth[mk].expense+=amt; a.byMonth[mk].outCnt++; }
+    if(isIn){ var ch=r['渠道']||'其他'; a.byChannel[ch]=(a.byChannel[ch]||0)+amt; if(ch==='微信') a.wx+=amt; }
+    else { var ct=r['分类']||'其他支出'; a.byCategory[ct]=(a.byCategory[ct]||0)+amt; }
+  });
+  a.net=a.income-a.expense;
+  return a;
+}
+function monthList(byMonth){
+  return Object.keys(byMonth).filter(function(k){return k;}).sort().slice(-6);
+}
+function pct(cur, prev){
+  if(!prev) return cur>0 ? 100 : 0;
+  return Math.round((cur-prev)/Math.abs(prev)*100);
+}
+function deltaTxt(d){
+  if(d === 0) return '与上月持平';
+  var arrow = d>0 ? '↑' : '↓';
+  return '环比 ' + arrow + ' ' + Math.abs(d) + '%';
+}
+
+/* ===== SVG 图表（手写、深色霓虹） ===== */
+function barDuo(labels, inVals, outVals, cIn, cOut){
+  var n=labels.length; if(!n) return '<div class="empty">暂无数据</div>';
+  var W=720,H=280,padL=52,padB=42,padT=34,padR=14;
+  var max=0;
+  for(var i=0;i<n;i++){ max=Math.max(max,inVals[i]||0,outVals[i]||0); }
+  max = max || 1; max = max*1.12;
+  var cw=(W-padL-padR)/n, groupW=cw*0.56, bw=groupW/2.4;
+  function y(v){ return padT + (H-padT-padB)*(1-v/max); }
+  var g='';
+  var ticks=4;
+  for(var t=0;t<=ticks;t++){
+    var v=max*t/ticks, yy=y(v);
+    g+='<line x1="'+padL+'" y1="'+yy+'" x2="'+(W-padR)+'" y2="'+yy+'" stroke="rgba(143,166,207,.14)" stroke-width="1"/>';
+    g+='<text x="'+(padL-8)+'" y="'+(yy+4)+'" text-anchor="end" fill="#5E7199" font-size="11">'+fmtWan(v)+'</text>';
+  }
+  for(var i=0;i<n;i++){
+    var cx=padL+cw*i+cw/2;
+    var x1=cx-bw-1.5, x2=cx+1.5;
+    var yI=y(inVals[i]||0), yO=y(outVals[i]||0);
+    g+='<rect x="'+x1+'" y="'+yI+'" width="'+bw+'" height="'+Math.max(0,H-padB-yI)+'" rx="4" fill="'+cIn+'"><title>'+labels[i]+' 收入 '+fmtFull(inVals[i]||0)+'</title></rect>';
+    g+='<rect x="'+x2+'" y="'+yO+'" width="'+bw+'" height="'+Math.max(0,H-padB-yO)+'" rx="4" fill="'+cOut+'"><title>'+labels[i]+' 支出 '+fmtFull(outVals[i]||0)+'</title></rect>';
+    g+='<text x="'+cx+'" y="'+(H-padB+18)+'" text-anchor="middle" fill="#8FA6CF" font-size="12">'+labels[i].slice(2)+'</text>';
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+function netBar(labels, vals){
+  var n=labels.length; if(!n) return '<div class="empty">暂无数据</div>';
+  var W=720,H=280,padL=52,padB=42,padT=34,padR=14;
+  var max=0;
+  for(var i=0;i<n;i++){ max=Math.max(max,Math.abs(vals[i]||0)); }
+  max = max || 1; max = max*1.18;
+  var cw=(W-padL-padR)/n, bw=Math.min(30,cw*0.42);
+  var zeroY = padT + (H-padT-padB)*(max/(max*2));
+  function y(v){ return padT + (H-padT-padB)*(1-(v+max)/(max*2)); }
+  var g='';
+  // 零线
+  g+='<line x1="'+padL+'" y1="'+zeroY+'" x2="'+(W-padR)+'" y2="'+zeroY+'" stroke="rgba(143,166,207,.4)" stroke-width="1.2" stroke-dasharray="4 4"/>';
+  for(var t=0;t<=2;t++){
+    var v=max - max*t, yy=y(v);
+    g+='<line x1="'+padL+'" y1="'+yy+'" x2="'+(W-padR)+'" y2="'+yy+'" stroke="rgba(143,166,207,.10)" stroke-width="1"/>';
+    g+='<text x="'+(padL-8)+'" y="'+(yy+4)+'" text-anchor="end" fill="#5E7199" font-size="11">'+fmtWan(v)+'</text>';
+  }
+  for(var i=0;i<n;i++){
+    var cx=padL+cw*i+cw/2, v=vals[i]||0, pos=v>=0;
+    var col = pos ? '#22D3EE' : '#FB7185';
+    var yv=y(v);
+    var top=pos?yv:zeroY, hgt=Math.abs(zeroY-yv);
+    if(hgt<2) hgt=2;
+    g+='<rect x="'+(cx-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+hgt+'" rx="4" fill="'+col+'" '+(pos?'opacity="0.92"':'')+'><title>'+labels[i]+' 净结余 '+fmtFull(v)+'</title></rect>';
+    g+='<text x="'+cx+'" y="'+(H-padB+18)+'" text-anchor="middle" fill="#8FA6CF" font-size="12">'+labels[i].slice(2)+'</text>';
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+function donut(parts, center, centerSub){
+  if(!parts.length) return '<div class="empty">暂无收入</div>';
+  var S=250, cx=S/2, cy=S/2, R=96, r=62, total=0;
+  parts.forEach(function(p){total+=p.value;}); total=total||1;
+  var g='', ang=-Math.PI/2;
+  function pt(rad,rr){ return [cx+rr*Math.cos(rad), cy+rr*Math.sin(rad)]; }
+  parts.forEach(function(p){
+    var frac=p.value/total, a2=ang+frac*Math.PI*2;
+    var large=(a2-ang)>Math.PI?1:0;
+    var p1=pt(ang,R), p2=pt(a2,R), p3=pt(a2,r), p4=pt(ang,r);
+    var path='M'+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' A'+R+' '+R+' 0 '+large+' 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+
+      ' L'+p3[0].toFixed(2)+' '+p3[1].toFixed(2)+' A'+r+' '+r+' 0 '+large+' 0 '+p4[0].toFixed(2)+' '+p4[1].toFixed(2)+' Z';
+    g+='<path d="'+path+'" fill="'+p.color+'" stroke="#0A1120" stroke-width="2"><title>'+p.label+' '+fmtFull(p.value)+'</title></path>';
+    ang=a2;
+  });
+  g+='<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" fill="#E8F0FF" font-size="22" font-weight="800">'+center+'</text>';
+  g+='<text x="'+cx+'" y="'+(cy+20)+'" text-anchor="middle" fill="#8FA6CF" font-size="12">'+centerSub+'</text>';
+  return '<svg viewBox="0 0 '+S+' '+S+'" style="max-width:230px;margin:2px auto" role="img">'+g+'</svg>';
+}
+function catBarHTML(cats){
+  if(!cats.length) return '<div class="empty">暂无支出记录</div>';
+  var top=cats.slice(0,6), max=top[0].value||1;
+  var h='';
+  top.forEach(function(c){
+    var pct=Math.max(3,c.value/max*100);
+    h+='<div style="display:flex;align-items:center;gap:10px;margin:13px 0">'+
+      '<div style="width:84px;font-size:12.5px;color:#B9C7E3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.name).slice(0,6)+'</div>'+
+      '<div style="flex:1;height:16px;border-radius:8px;background:rgba(143,166,207,.12);overflow:hidden">'+
+        '<div style="height:100%;width:'+pct+'%;border-radius:8px;background:linear-gradient(90deg,#22D3EE,#5B8CFF);box-shadow:0 0 12px rgba(34,211,238,.5)"></div>'+
+      '</div>'+
+      '<div style="width:88px;text-align:right;font-size:12.5px;color:#9fd8ff;font-variant-numeric:tabular-nums">'+fmtWan(c.value)+'</div>'+
+    '</div>';
+  });
+  return h;
+}
+
+/* ===== 渲染 ===== */
+function kpiCard(lab,val,sub,color,glow){
+  return '<div class="kpi" style="--kc:'+color+';--kglow:'+glow+'">'+
+    '<div class="lab">'+lab+'</div><div class="val">'+val+'</div><div class="sub">'+(sub||'')+'</div></div>';
+}
+function render(d){
+  var la=aggLedger(d.ledger);
+  var wxRate = la.income>0 ? Math.round(la.wx/la.income*100) : 0;
+  var tm = (new Date()).toISOString().slice(0,7);
+  var now = new Date();
+  var pm = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,7);
+  var cur = la.byMonth[tm] || {income:0,expense:0,inCnt:0,outCnt:0};
+  var prev = la.byMonth[pm] || {income:0,expense:0,inCnt:0,outCnt:0};
+  var curNet = cur.income - cur.expense;
+  var avgIn = la.inCnt>0 ? la.income/la.inCnt : 0;
+  var totalCnt = la.inCnt + la.outCnt;
+
+  var html =
+    kpiCard('总收入', fmtWan(la.income), '本月 '+fmtWan(cur.income), '#34D399','rgba(52,211,153,.4)')+
+    kpiCard('总支出', fmtWan(la.expense), '本月 '+fmtWan(cur.expense), '#FB7185','rgba(251,113,133,.4)')+
+    kpiCard('累计净结余', fmtWan(la.net), la.net>=0?'整体盈余':'赤字预警', la.net>=0?'#22D3EE':'#FB7185','rgba(34,211,238,.4)')+
+    kpiCard('本月净结余', fmtWan(curNet), curNet>=0?'本月盈余':'本月赤字', curNet>=0?'#22D3EE':'#FB7185','rgba(34,211,238,.4)')+
+    kpiCard('本月收入', fmtWan(cur.income), deltaTxt(pct(cur.income,prev.income)), '#34D399','rgba(52,211,153,.4)')+
+    kpiCard('本月支出', fmtWan(cur.expense), deltaTxt(pct(cur.expense,prev.expense)), '#FBBF24','rgba(251,191,36,.4)')+
+    kpiCard('流水笔数', totalCnt+' 笔', '本月 '+(cur.inCnt+cur.outCnt)+' 笔', '#5B8CFF','rgba(91,140,255,.45)')+
+    kpiCard('微信收入占比', wxRate+'%', '笔均收入 '+fmtWan(avgIn), '#A78BFA','rgba(167,139,250,.45)');
+  document.getElementById('kpis').innerHTML = html;
+
+  // 月度收支
+  var lms = monthList(la.byMonth);
+  document.getElementById('led-trend').innerHTML = barDuo(
+    lms, lms.map(function(k){return la.byMonth[k].income;}), lms.map(function(k){return la.byMonth[k].expense;}),
+    '#34D399','#FB7185');
+  document.getElementById('led-trend-sub').textContent = lms.length ? ('近 '+lms.length+' 个月') : '收入与支出分组对比';
+
+  // 月度净结余
+  document.getElementById('led-net').innerHTML = netBar(
+    lms, lms.map(function(k){return la.byMonth[k].income - la.byMonth[k].expense;}));
+  document.getElementById('led-net-sub').textContent = lms.length ? ('近 '+lms.length+' 个月') : '收入减支出，正为盈余';
+
+  // 收入渠道环形
+  var parts = Object.keys(la.byChannel).map(function(k){ return {label:k,value:la.byChannel[k],color:CHANNEL_COLOR[k]||'#8FA6CF'}; })
+    .sort(function(a,b){return b.value-a.value;});
+  document.getElementById('led-pie').innerHTML = donut(parts, fmtWan(la.income), '收入合计');
+  var lg='';
+  parts.forEach(function(p){ lg+='<span><i style="background:'+p.color+'"></i>'+esc(p.label)+' '+fmtWan(p.value)+'</span>'; });
+  document.getElementById('led-pie-legend').innerHTML = lg || '<span style="color:var(--txt-3)">暂无</span>';
+
+  // 支出分类
+  var cats = Object.keys(la.byCategory).map(function(k){ return {name:k,value:la.byCategory[k]}; })
+    .sort(function(a,b){return b.value-a.value;});
+  document.getElementById('led-catbar').innerHTML = catBarHTML(cats);
+
+  document.getElementById('status-line').textContent =
+    '已同步 · 门店流水 '+d.ledger.length+' 条 · 数据来自资料库（仅经营收支，不含工资）';
+}
+
+/* ===== 时钟 ===== */
+function tick(){
+  var d=new Date();
+  function p(x){return (x<10?'0':'')+x;}
+  document.getElementById('clk-time').textContent = p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+  var wk='日一二三四五六'[d.getDay()];
+  document.getElementById('clk-date').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+wk;
+}
+setInterval(tick,1000); tick();
+
+/* 全屏 */
+document.getElementById('btn-fs').onclick = function(){
+  var lab=document.getElementById('fs-label');
+  if(!document.fullscreenElement){
+    (document.documentElement.requestFullscreen||function(){}).call(document.documentElement);
+    lab.textContent='退出全屏';
+  }else{
+    (document.exitFullscreen||function(){}).call(document);
+    lab.textContent='全屏';
+  }
+};
+document.addEventListener('fullscreenchange',function(){
+  document.getElementById('fs-label').textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+});
+
+/* 启动 */
+loadData().then(render).catch(function(){
+  document.getElementById('status-line').textContent = '资料库未连接（请在已发布的页面中打开，或检查数据表绑定）';
+  document.getElementById('kpis').innerHTML='';
+  ['led-trend','led-pie','led-net','led-catbar'].forEach(function(id){
+    document.getElementById(id).innerHTML='<div class="empty">暂无数据 / 离线</div>';
+  });
+});
+</script>
+</body>
+</html>

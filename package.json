@@ -1,0 +1,13 @@
+{
+  "name": "data-workspace-cf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "数据工作台 — Cloudflare Pages + KV 部署",
+  "scripts": {
+    "deploy": "wrangler pages deploy pages --binding KV=DATA_KV"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "wrangler": "latest"
+  }
+}

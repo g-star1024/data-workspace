@@ -1,0 +1,11 @@
+# Cloudflare
+*.log
+.env
+.env.local
+wrangler.json
+
+# Node
+node_modules/
+
+# OS
+.DS_Store

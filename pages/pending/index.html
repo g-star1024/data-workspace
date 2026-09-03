@@ -1,0 +1,3281 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-page-node-id="PzBuUwEC0wEY7FBYAxA9Gk">
+<head data-page-node-id="lnDTKf3O6LZAk6EaLuHe0U">
+<meta charset="utf-8" data-page-node-id="aBrGykgQZwDpzPFwpoXCQf">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="K3ahr3a7Fg4LP0O9qVesGj">
+<!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
+<title>待处理 · 数据分析工作台</title>
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('wb_dataws_theme');
+    var dark = saved ? saved === 'dark' : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }catch(e){}
+})();
+</script>
+<style>
+/* ============ 数据分析工作台 · v3.0 设计系统 ============ */
+:root{
+  --bg:#F4F6FB;
+  --bg-grad:
+    radial-gradient(1200px 620px at 4% -12%, #EAEEFF 0%, rgba(234,238,255,0) 52%),
+    radial-gradient(1000px 560px at 104% -8%, #E7FAF1 0%, rgba(231,250,241,0) 50%),
+    radial-gradient(900px 520px at 64% -4%, #F6EEFF 0%, rgba(246,238,255,0) 54%);
+  --surface:#FFFFFF;
+  --surface-2:#F5F7FC;
+  --surface-3:#EDF1F8;
+  --border:#E8ECF4;
+  --border-strong:#D9DFEC;
+  --text:#0F172A;
+  --text-2:#475569;
+  --text-3:#94A3B8;
+  --brand:#4F46E5;
+  --brand-2:#6366F1;
+  --brand-soft:#EEF0FF;
+  --brand-soft-2:#F5F6FF;
+  --income:#059669;
+  --income-2:#10B981;
+  --income-soft:#E7F6EE;
+  --expense:#E11D48;
+  --expense-2:#FB7185;
+  --expense-soft:#FDECF0;
+  --warn:#D97706;
+  --warn-2:#F59E0B;
+  --warn-soft:#FEF3E2;
+  --r-card:24px; --r-inner:16px; --r-ctl:14px; --r-pill:999px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04), 0 3px 10px rgba(15,23,42,.05);
+  --shadow:0 6px 18px rgba(15,23,42,.06), 0 22px 48px rgba(15,23,42,.07);
+  --shadow-lg:0 30px 70px rgba(15,23,42,.22);
+  --ring:0 0 0 4px rgba(79,70,229,.16);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html[data-theme="dark"]{
+  --bg:#0B0E16;
+  --bg-grad:
+    radial-gradient(1200px 620px at 4% -12%, #1A2348 0%, rgba(26,35,72,0) 52%),
+    radial-gradient(1000px 560px at 104% -8%, #10301F 0%, rgba(16,48,31,0) 50%),
+    radial-gradient(900px 520px at 64% -4%, #241634 0%, rgba(36,22,52,0) 54%);
+  --surface:#151927;
+  --surface-2:#1C2230;
+  --surface-3:#262D3E;
+  --border:#2A3142;
+  --border-strong:#363F54;
+  --text:#EEF1F8;
+  --text-2:#A7B0C4;
+  --text-3:#7A839B;
+  --brand:#8B93FF;
+  --brand-2:#A5AEFF;
+  --brand-soft:#1F294E;
+  --brand-soft-2:#232E55;
+  --income:#34D399;
+  --income-2:#6EE7B7;
+  --income-soft:#10271C;
+  --expense:#FB7185;
+  --expense-2:#FCA5B1;
+  --expense-soft:#2C1B1E;
+  --warn:#FBBF24;
+  --warn-2:#FCD34D;
+  --warn-soft:#2C2410;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.26);
+  --shadow:0 8px 22px rgba(0,0,0,.34), 0 24px 52px rgba(0,0,0,.34);
+  --shadow-lg:0 30px 70px rgba(0,0,0,.5);
+  --ring:0 0 0 4px rgba(139,147,255,.22);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg-grad), var(--bg);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom));
+}
+.wrap{width:100%; max-width:1680px; margin:0 auto; padding:26px clamp(16px,2.6vw,40px) 0}
+h1,h2,h3{margin:0; font-weight:760; letter-spacing:-.02em}
+a{color:var(--brand)}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--shadow); padding:24px; margin-bottom:20px;
+  transition:box-shadow .35s var(--ease), transform .35s var(--ease), border-color .35s var(--ease)}
+.card:hover{border-color:var(--border-strong)}
+
+/* icon */
+.ic{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+.ic-sm{width:15px;height:15px}
+
+/* header · 毛玻璃应用栏 */
+.hdr{display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:8px 6px 18px;
+  position:sticky; top:0; z-index:30; margin:0 -24px 6px; padding-left:24px; padding-right:24px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, transparent), color-mix(in srgb, var(--bg) 0%, transparent));
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.hdr h1{font-size:23px; flex:1 1 auto; min-width:220px; display:flex; align-items:center; gap:14px; font-weight:780}
+.logo{width:46px;height:46px;flex:0 0 auto;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2)); box-shadow:0 8px 20px rgba(79,70,229,.34); color:#fff}
+.logo svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hdr .sub{font-size:12.5px; color:var(--text-3); font-weight:450; display:block; margin-top:3px; letter-spacing:.01em}
+.tools{display:flex; gap:9px; flex-wrap:wrap}
+.status{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-2);
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-pill); padding:8px 15px; min-height:36px; box-shadow:var(--shadow-sm)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:0 0 auto}
+.dot.ok{background:var(--income); box-shadow:0 0 0 4px var(--income-soft)}
+.dot.loading{background:var(--warn); animation:pulse 1.1s infinite}
+.dot.off{background:var(--expense); box-shadow:0 0 0 4px var(--expense-soft)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  min-height:44px; padding:0 17px; border-radius:var(--r-ctl); border:1px solid var(--border);
+  background:var(--surface); color:var(--text); font-size:14px; font-weight:600; font-family:inherit; cursor:pointer;
+  box-shadow:var(--shadow-sm); transition:transform .18s var(--ease), background .18s, border-color .18s, box-shadow .18s}
+.btn:hover{background:var(--surface-2); transform:translateY(-1px); box-shadow:var(--shadow)}
+.btn:active{transform:translateY(0); opacity:.85}
+.btn:disabled{opacity:.5;cursor:not-allowed; transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-2)); border-color:transparent; color:#fff; box-shadow:0 8px 20px rgba(79,70,229,.30)}
+.btn-primary:hover{filter:brightness(1.05); box-shadow:0 12px 26px rgba(79,70,229,.36)}
+.btn-danger{color:var(--expense); border-color:var(--expense-soft); background:var(--expense-soft)}
+.btn-danger:hover{background:var(--expense); color:#fff; border-color:var(--expense)}
+.btn-sm{min-height:38px; padding:0 14px; font-size:13px; border-radius:12px}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--text-2);box-shadow:none}
+.btn-ghost:hover{background:var(--surface-2); box-shadow:none}
+
+/* today */
+.today{border:1px solid var(--warn-soft); background:linear-gradient(180deg,var(--warn-soft) 0%, var(--surface) 60%); overflow:hidden}
+.today h2{font-size:16px; display:flex; align-items:center; gap:9px}
+.ticon{width:32px;height:32px;flex:0 0 auto;border-radius:11px;display:grid;place-items:center;background:var(--warn); color:#fff; box-shadow:0 5px 14px rgba(217,119,6,.32)}
+.ticon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tlist{margin-top:14px; display:flex; flex-direction:column; gap:10px}
+.titem{display:flex; align-items:center; gap:13px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-inner); padding:14px 16px; font-size:14px;
+  transition:transform .18s var(--ease), box-shadow .18s, border-color .18s}
+.titem:hover{transform:translateX(3px); box-shadow:var(--shadow-sm); border-color:var(--border-strong)}
+.titem.overdue{background:var(--expense-soft); border-color:var(--expense-soft); color:var(--expense)}
+.titem.overdue:hover{border-color:var(--expense)}
+.titem .txt{flex:1 1 220px; min-width:0; line-height:1.45}
+.titem.overdue .txt{font-weight:650}
+.titem .lbl{font-size:11px; padding:3px 10px; border-radius:var(--r-pill); background:var(--expense); color:#fff; font-weight:650; flex:0 0 auto; letter-spacing:.02em}
+.empty{color:var(--text-3); font-size:13.5px; padding:8px 2px}
+.lock-placeholder{text-align:center; padding:42px 18px; display:flex; flex-direction:column; align-items:center}
+.lock-icon{width:56px; height:56px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--brand)}
+.lock-icon svg{width:26px; height:26px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+
+/* tabs */
+.tabs{display:flex; gap:7px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-pill); padding:7px; margin-bottom:20px; box-shadow:var(--shadow-sm)}
+.tab{flex:1; min-height:48px; display:flex; align-items:center; justify-content:center; gap:8px;
+  border:0; background:transparent; color:var(--text-2); font-size:15px; font-weight:650; font-family:inherit;
+  border-radius:var(--r-pill); cursor:pointer; transition:color .2s, background .25s var(--ease), box-shadow .25s var(--ease)}
+.tab .ic{width:18px;height:18px}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--surface); color:var(--brand); box-shadow:var(--shadow-sm)}
+.tab .badge{display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 7px; border-radius:999px; background:var(--expense); color:#fff; font-size:12px; font-weight:720; box-shadow:0 2px 6px color-mix(in srgb, var(--expense) 28%, transparent)}
+.view{display:none} .view.on{display:block; animation:fade .35s var(--ease)}
+
+/* 设置弹窗 */
+.src-list{display:flex; flex-direction:column; gap:10px; margin:10px 0}
+.src-item{display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-card)}
+.src-item .meta{flex:1; min-width:0}
+.src-item .name{font-weight:650; font-size:14px; color:var(--text)}
+.src-item .path{font-size:12px; color:var(--text-3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.src-item .type-chip{font-size:11px; padding:3px 8px; border-radius:999px; background:var(--surface); color:var(--text-2); border:1px solid var(--border)}
+.switch{position:relative; width:44px; height:24px; flex:0 0 auto}
+.switch input{opacity:0; width:0; height:0}
+.switch .slider{position:absolute; inset:0; border-radius:999px; background:var(--surface-3); transition:.2s; cursor:pointer}
+.switch .slider:before{content:""; position:absolute; left:3px; top:3px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.18); transition:.2s}
+.switch input:checked + .slider{background:var(--brand)}
+.switch input:checked + .slider:before{transform:translateX(20px)}
+.src-empty{padding:24px; text-align:center; color:var(--text-3); font-size:13px}
+.role-chip{display:inline-flex; align-items:center; font-size:11px; padding:2px 9px; border-radius:999px; margin-right:5px; font-weight:650; background:var(--surface-3); color:var(--text-2); border:1px solid var(--border)}
+.role-chip.admin{background:var(--brand); color:#fff; border-color:transparent}
+.role-chip.approver{background:var(--warn-soft); color:var(--warn); border-color:transparent}
+.role-chip.applicant{background:var(--brand-soft); color:var(--brand); border-color:transparent}
+.admin-user-row .meta .name{font-size:14px}
+.add-src{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.add-src .fld{flex:1 1 180px; margin:0}
+.add-src .btn{flex:0 0 auto}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+/* kpi */
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px}
+.kpi{position:relative; overflow:hidden; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-inner); padding:18px 18px 16px; box-shadow:var(--shadow-sm); transition:transform .22s var(--ease), box-shadow .22s}
+.kpi:hover{transform:translateY(-3px); box-shadow:var(--shadow)}
+.kpi::before{content:""; position:absolute; left:0; top:0; right:0; height:3px; background:var(--border-strong); opacity:.5}
+.kpi:has(.v.brand)::before{background:linear-gradient(90deg,var(--brand),var(--brand-2)); opacity:1}
+.kpi:has(.v.pos)::before{background:linear-gradient(90deg,var(--income),var(--income-2)); opacity:1}
+.kpi:has(.v.neg)::before{background:linear-gradient(90deg,var(--expense),var(--expense-2)); opacity:1}
+.kpi .chip{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;flex:0 0 auto;
+  box-shadow:0 4px 12px rgba(15,23,42,.06)}
+.kpi .chip svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi.brand .chip{background:var(--brand-soft);color:var(--brand);box-shadow:0 4px 14px rgba(79,70,229,.18)}
+.kpi.pos .chip{background:var(--income-soft);color:var(--income);box-shadow:0 4px 14px rgba(5,150,105,.18)}
+.kpi.neg .chip{background:var(--expense-soft);color:var(--expense);box-shadow:0 4px 14px rgba(225,29,72,.16)}
+.kpi.net .chip{background:var(--brand-soft);color:var(--brand);box-shadow:0 4px 14px rgba(79,70,229,.18)}
+.kpi .k{font-size:12px; color:var(--text-3); margin-bottom:7px; letter-spacing:.04em; text-transform:uppercase; font-weight:600}
+.kpi .v{font-size:25px; font-weight:780; letter-spacing:-.025em; font-variant-numeric:tabular-nums; line-height:1.08; margin-top:2px}
+.kpi .v.pos{color:var(--income)} .kpi .v.neg{color:var(--expense)} .kpi .v.brand{color:var(--brand)}
+
+/* controls */
+.ctl{display:flex; gap:11px; flex-wrap:wrap; align-items:center; margin-bottom:16px}
+.seg{display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-ctl); padding:5px; gap:3px}
+.seg button{border:0; background:transparent; color:var(--text-2); font-family:inherit; font-weight:600; font-size:13.5px;
+  min-height:40px; padding:0 16px; border-radius:11px; cursor:pointer; transition:background .2s, color .2s, box-shadow .2s}
+.seg button.on{background:var(--surface); color:var(--brand); box-shadow:var(--shadow-sm)}
+label.fld{display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-3); font-weight:550}
+input,select,textarea{
+  font-family:inherit; font-size:16px; color:var(--text); background:var(--surface);
+  border:1px solid var(--border-strong); border-radius:var(--r-ctl); padding:11px 13px; min-height:44px; width:100%;
+  transition:border-color .18s, box-shadow .18s, background .18s}
+textarea{min-height:90px; resize:vertical; line-height:1.6}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--brand); box-shadow:var(--ring)}
+select{cursor:pointer; -webkit-appearance:none; appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:36px}
+
+/* form grid */
+.form{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; align-items:end}
+.form .span2{grid-column:span 2}
+
+/* tables */
+.tbl-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -2px; padding:2px}
+table{width:100%; border-collapse:collapse; font-size:14px}
+thead th{position:sticky; top:0; background:var(--surface); z-index:1}
+th{text-align:left; font-size:11.5px; color:var(--text-3); font-weight:680; letter-spacing:.03em; padding:12px 12px; border-bottom:1.5px solid var(--border); white-space:nowrap; text-transform:uppercase}
+td{padding:13px 12px; border-bottom:1px solid var(--border); vertical-align:middle}
+tbody tr{transition:background .16s}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+td.ops{text-align:right; white-space:nowrap}
+td.ops .btn{margin-left:6px}
+.pill{display:inline-flex; align-items:center; font-size:11.5px; padding:3px 11px; border-radius:var(--r-pill); font-weight:650; white-space:nowrap; line-height:1.5}
+.pill.ok{background:var(--income-soft); color:var(--income)}
+.pill.bad{background:var(--expense-soft); color:var(--expense)}
+.pill.mid{background:var(--warn-soft); color:var(--warn)}
+.pill.neu{background:var(--surface-2); color:var(--text-2)}
+.amt.pos{color:var(--income); font-weight:700} .amt.neg{color:var(--expense); font-weight:700}
+.muted{color:var(--text-3)}
+.sec-h{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.sec-h h3{font-size:16px; font-weight:720}
+.sec-h .hint{font-size:12.5px; color:var(--text-3)}
+.ck{width:18px;height:18px;flex:0 0 auto;accent-color:var(--brand);cursor:pointer}
+th.ck,td.ck{width:38px;min-width:38px;text-align:center;padding-left:6px;padding-right:6px}
+td.ck::before{display:none}
+
+/* charts */
+.charts{display:grid; grid-template-columns:1.4fr 1fr; gap:16px}
+.chart-box{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-inner); padding:20px 20px 16px; box-shadow:var(--shadow-sm)}
+.chart-box h4{margin:0 0 3px; font-size:14.5px; font-weight:700}
+.chart-box .cs{font-size:12px; color:var(--text-3); margin-bottom:8px}
+.chart-box svg{display:block; width:100%; height:auto; overflow:visible}
+.legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:12.5px; color:var(--text-2)}
+.legend i{width:11px;height:11px;border-radius:4px;display:inline-block;margin-right:7px;vertical-align:-1px}
+.catbar{margin-top:4px}
+.catbar .row{display:flex; align-items:center; gap:11px; margin-bottom:11px; font-size:13px}
+.catbar .nm{width:84px; flex:0 0 auto; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.catbar .tr{flex:1; height:10px; background:var(--surface-2); border-radius:var(--r-pill); overflow:hidden}
+.catbar .fl{height:100%; border-radius:var(--r-pill); background:linear-gradient(90deg,var(--expense),var(--expense-2)); transition:width .5s var(--ease)}
+.catbar .vl{width:98px; text-align:right; flex:0 0 auto; font-variant-numeric:tabular-nums; font-weight:700}
+
+/* ===== 筛选悬浮汇总面板（默认图表占满，唤出悬浮时收缩为两列） ===== */
+.charts-row{display:grid; grid-template-columns:1fr; gap:16px; align-items:start; transition:grid-template-columns .3s var(--ease)}
+.charts-row.with-float{grid-template-columns:1fr 232px}
+.charts-row .charts{display:flex; flex-direction:column; gap:16px}
+/* 鼎知堂：柱状图与环形图一行并列，分类榜整行在下；唤出悬浮或窄屏时回落单列 */
+.charts-row .charts.charts-duo{display:grid; grid-template-columns:1.35fr 1fr; gap:16px; align-items:start}
+.charts-row .charts.charts-duo .chart-box.span-all{grid-column:1/-1}
+.charts-row.with-float .charts.charts-duo{grid-template-columns:1fr}
+.float-panel{display:flex; flex-direction:column; gap:12px; position:sticky; top:86px; animation:floatIn .3s var(--ease)}
+.float-panel.hidden{display:none}
+@keyframes floatIn{from{opacity:0; transform:translateX(14px)} to{opacity:1; transform:translateX(0)}}
+/* 待处理加密门 */
+.pending-lock{max-width:560px; margin:28px auto; text-align:center; padding:36px 28px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--shadow-sm)}
+.pending-lock .pl-ic{width:60px; height:60px; margin:0 auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--brand) 12%, transparent); color:var(--brand)}
+.pending-lock .pl-ic svg{width:30px; height:30px}
+.pending-lock h3{margin:0 0 8px; font-size:17px}
+.pending-lock p{margin:0 0 20px; color:var(--text-3); font-size:13.5px; line-height:1.7}
+/* 导入中心返回栏 */
+.subpage-bar{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+.subpage-bar h2{margin:0; font-size:17px}
+.subpage-bar .spacer{flex:1}
+body.in-subpage .tabs{display:none}
+.float-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-inner); padding:16px 18px; box-shadow:var(--shadow-sm); border-top:3px solid var(--brand)}
+.float-card .fk{font-size:12px; color:var(--text-3); margin-bottom:4px}
+.float-card .fv{font-size:20px; font-weight:760; font-variant-numeric:tabular-nums; letter-spacing:-.5px}
+.float-card.income{border-top-color:var(--income)}
+.float-card.income .fv{color:var(--income)}
+.float-card.expense{border-top-color:var(--expense)}
+.float-card.expense .fv{color:var(--expense)}
+.float-card.net{border-top-color:var(--text-2)}
+.float-card.net .fv{color:var(--text)}
+.float-card.brand{border-top-color:var(--brand)}
+.float-card.brand .fv{color:var(--brand)}
+.float-card .hint{font-size:11px; color:var(--text-3); margin-top:4px}
+.table-ctl{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; padding:12px 14px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-inner)}
+.table-ctl label{margin:0}
+.table-ctl .btn-ghost{margin-left:auto}
+
+/* modal */
+.mask{position:fixed; inset:0; background:rgba(12,15,26,.5); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center;
+  padding:18px; z-index:60; overflow-y:auto}
+.mask[hidden]{display:none}
+.modal{background:var(--surface); border:1px solid var(--border); border-radius:var(--r-card); width:100%; max-width:540px; box-shadow:var(--shadow-lg); animation:pop .3s var(--ease)}
+@keyframes pop{from{opacity:0; transform:translateY(14px) scale(.97)} to{opacity:1; transform:none}}
+.mhead{display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border)}
+.mhead h3{font-size:16.5px}
+.mbody{padding:20px 22px; display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.mbody .full{grid-column:span 2}
+.mfoot{display:flex; justify-content:flex-end; gap:10px; padding:16px 22px; border-top:1px solid var(--border)}
+
+/* toast */
+.toast{position:fixed; left:50%; transform:translateX(-50%) translateY(12px); bottom:calc(26px + env(safe-area-inset-bottom));
+  background:var(--text); color:var(--bg); padding:12px 22px; border-radius:var(--r-pill); font-size:14px; font-weight:550;
+  z-index:90; box-shadow:var(--shadow-lg); max-width:90vw; text-align:center; opacity:0; transition:opacity .25s, transform .25s var(--ease)}
+.toast:not([hidden]){opacity:1; transform:translateX(-50%) translateY(0)}
+
+.note{font-size:12.5px; color:var(--text-2); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-inner); padding:12px 15px; margin-top:13px; line-height:1.65}
+
+/* 登录守卫横幅 */
+.auth-banner{display:flex; align-items:center; gap:12px; padding:12px 16px; margin-bottom:16px;
+  border-radius:var(--r-inner); font-size:13.5px; line-height:1.55;
+  background:color-mix(in srgb, var(--warn) 12%, var(--surface));
+  border:1px solid color-mix(in srgb, var(--warn) 38%, var(--border));
+  color:var(--text); animation:chartIn .4s var(--ease) both}
+.auth-banner[hidden]{display:none}
+.auth-banner .ab-ic{width:22px; height:22px; flex:0 0 auto; fill:var(--warn); stroke:var(--warn)}
+.auth-banner .ab-ic path:first-child{stroke:none}
+.auth-banner .ab-txt{flex:1 1 auto; min-width:0}
+.auth-banner .ab-txt b{color:var(--warn)}
+.auth-banner .ab-txt code{background:color-mix(in srgb, var(--warn) 16%, transparent); padding:1px 6px; border-radius:6px; font-size:12.5px}
+.auth-banner .btn{flex:0 0 auto}
+.importer{border:1px dashed var(--border-strong); border-radius:var(--r-inner); padding:16px; margin-top:13px; background:var(--surface-2)}
+.prev{overflow-x:auto; margin-top:12px; font-size:12.5px}
+.map-row{display:flex; gap:10px; align-items:center; margin-bottom:9px; flex-wrap:wrap}
+.map-row .cn{width:112px; flex:0 0 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; color:var(--text-2)}
+.map-row select{width:auto; min-width:152px; flex:0 0 auto; min-height:38px; font-size:14px}
+
+/* ===== v3.0 图表动效与质感 ===== */
+.chart-box svg{animation:chartIn .55s var(--ease) both}
+@keyframes chartIn{from{opacity:0; transform:translateY(10px) scale(.992)} to{opacity:1; transform:none}}
+.grid-dash{stroke-dasharray:3 5; stroke:var(--border)}
+.line-anim{stroke-dasharray:1; stroke-dashoffset:1; animation:draw 1.05s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.bar-g{transform-box:fill-box; transform-origin:bottom; animation:grow .6s var(--ease) both}
+@keyframes grow{from{transform:scaleY(.04); opacity:.35} to{transform:scaleY(1); opacity:1}}
+.bar-val{font-size:11px; font-weight:700; font-family:inherit; font-variant-numeric:tabular-nums}
+
+/* ===== v3.0 工资隐私门 ===== */
+.lock-banner{display:flex; align-items:center; gap:13px; padding:14px 16px; margin-bottom:18px;
+  background:linear-gradient(135deg,var(--brand-soft),var(--brand-soft-2)); border:1px solid var(--border); border-radius:var(--r-inner); box-shadow:var(--shadow-sm)}
+.lock-banner[hidden]{display:none}
+.lb-ic{width:38px;height:38px;flex:0 0 auto;border-radius:12px;display:grid;place-items:center;background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.3)}
+.lb-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.lb-txt{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px}
+.lb-txt b{font-size:14.5px; font-weight:700}
+.lb-txt span{font-size:12.5px; color:var(--text-2)}
+.lock-chart{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:160px; color:var(--text-3); padding:30px 10px}
+.lock-chart svg{width:46px;height:46px;fill:none;stroke:var(--text-3);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lock-chart span{font-size:13px}
+
+/* ===== v3.0 批量操作条 ===== */
+.batch-bar{position:fixed; left:50%; transform:translateX(-50%) translateY(20px); bottom:calc(18px + env(safe-area-inset-bottom));
+  display:flex; align-items:center; gap:14px; padding:12px 16px; z-index:55;
+  background:color-mix(in srgb, var(--surface) 86%, transparent); border:1px solid var(--border-strong);
+  border-radius:var(--r-pill); box-shadow:var(--shadow-lg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  max-width:calc(100vw - 28px)}
+.batch-bar[hidden]{display:none}
+.batch-bar:not([hidden]){animation:barUp .3s var(--ease) both}
+@keyframes barUp{from{opacity:0; transform:translateX(-50%) translateY(36px)} to{opacity:1; transform:translateX(-50%) translateY(0)}}
+#batch-count{font-size:13.5px; font-weight:650; color:var(--text); white-space:nowrap; padding-left:6px}
+.batch-acts{display:flex; gap:8px; flex-wrap:wrap}
+.batch-acts .btn{min-height:38px}
+.btn-settle{color:var(--income); border-color:var(--income-soft); background:var(--income-soft)}
+.btn-settle:hover{background:var(--income); color:#fff; border-color:var(--income)}
+.btn-unsettle{color:var(--warn); border-color:var(--warn-soft); background:var(--warn-soft)}
+.btn-unsettle:hover{background:var(--warn); color:#fff; border-color:var(--warn)}
+
+/* ===== 导入中心布局 ===== */
+.imp-2col{display:grid; grid-template-columns:1fr auto; gap:13px; align-items:end}
+@media (max-width:640px){ .imp-2col{grid-template-columns:1fr} .imp-2col .btn{align-self:stretch} }
+
+@media (max-width:1100px){
+  .charts-row, .charts-row.with-float{grid-template-columns:1fr}
+  .float-panel{position:static; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:4px}
+  .float-card{padding:13px 14px}
+  .float-card .fv{font-size:17px}
+}
+@media (max-width:900px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .charts{grid-template-columns:1fr}
+  .charts-row .charts.charts-duo{grid-template-columns:1fr}
+  .form{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:768px){
+  .wrap{padding:18px 15px 0}
+  .hdr{margin:0 -15px 6px; padding-left:15px; padding-right:15px; padding-top:6px; padding-bottom:12px}
+  .hdr h1{font-size:20px; flex:1 1 100%}
+  .logo{width:40px;height:40px}
+  .tools{width:100%} .tools .btn{flex:1 1 auto}
+  .card{padding:18px; border-radius:20px}
+  .form{grid-template-columns:1fr}
+  .form .span2{grid-column:span 1}
+  .mbody{grid-template-columns:1fr} .mbody .full{grid-column:span 1}
+  .kpis{grid-template-columns:1fr 1fr; gap:11px}
+  .kpi .v{font-size:21px}
+  table,thead,tbody,tr,td{display:block; width:100%}
+  thead{display:none}
+  tr{background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-inner); padding:12px 14px; margin-bottom:11px; box-shadow:var(--shadow-sm)}
+  tbody tr:hover{background:var(--surface-2)}
+  td{border:0; padding:5px 0; display:flex; justify-content:space-between; gap:14px; align-items:center; text-align:right}
+  td::before{content:attr(data-label); color:var(--text-3); font-size:12px; flex:0 0 auto; text-align:left; font-weight:550; text-transform:none; letter-spacing:0}
+  td.ops{justify-content:flex-end} td.ops::before{margin-right:auto}
+  td.ck{display:flex;justify-content:flex-start;align-items:center;padding:10px 2px}
+  td.num{text-align:right}
+  .tbl-wrap{overflow:visible; margin:0; padding:0}
+  .map-row .cn{width:100%}
+  .map-row select{width:100%; flex:1 1 auto}
+  .batch-bar{left:12px; right:12px; transform:none; flex-wrap:wrap; justify-content:space-between; border-radius:18px}
+  .batch-bar:not([hidden]){animation:none}
+}
+</style>
+</head>
+<body data-page-node-id="4vFkxB42WLD96TBXYtHe1O">
+
+<div class="wrap" data-page-node-id="7l29uEqmtjaI0RtGThS2gr">
+
+  <div class="hdr" data-page-node-id="VKnNI3rSrZqzDtHKzh5A8f">
+    <h1 data-page-node-id="1PMM5HCi1j7oHgKWvUZryP"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4v7H4z"/><path d="M10 6h4v14h-4z"/><path d="M16 10h4v10h-4z"/><path d="M3 20h18"/></svg></span>待处理事项<span class="sub" data-page-node-id="SyJrlCGd6d0WJhkcQmyTKb">今天要处理 · 待办汇总（独立页）</span></h1>
+    <div class="tools" data-page-node-id="vxl0gBOIqZ36C0a7SbXRFQ">
+      <span class="status" id="status" data-page-node-id="uv8YqxKu611PlHhYPq8zia"><i class="dot loading" id="status-dot" data-page-node-id="AIkOddCoUzstMv6JPoZXUU"></i><span id="status-text" data-page-node-id="UAQw0HcF1U3cr8iLqNC3YI">加载中</span></span>
+      <button class="btn btn-sm" id="btn-user" type="button" data-page-node-id="userBtn01"></button>
+      <button class="btn btn-sm" id="btn-export" type="button" data-page-node-id="NQcHdJmnAjCCMCAYQhtQzx"></button>
+      <button class="btn btn-sm" id="btn-import" type="button" data-page-node-id="gHGZlnAnIzbADhh0udbYJt"></button>
+      <button class="btn btn-sm" id="btn-theme" type="button" data-page-node-id="CqXNMJP2AOUrAugcrB7GcD"></button>
+      <button class="btn btn-sm" id="btn-settings" type="button" data-page-node-id="settingsBtn01"></button>
+    </div>
+  </div>
+
+  <div class="auth-banner" id="auth-banner" hidden data-page-node-id="authBanner01">
+    <svg viewBox="0 0 24 24" class="ab-ic" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="ab-txt" id="auth-banner-text"></div>
+    <button class="btn btn-sm" id="auth-banner-x" type="button" aria-label="关闭提示">知道了</button>
+  </div>
+
+  <div class="tabs" data-page-node-id="LBsHldP3hmpCLKMzDSdiG7" style="display:none">
+    <button class="tab on" id="tab-ledger" type="button" data-page-node-id="7PP6dcD139AH37SDPsTC0J"></button>
+    <button class="tab" id="tab-salary" type="button" data-page-node-id="tCrQI78irbCMBHQvy3tcoC"></button>
+    <button class="tab" id="tab-pending" type="button" data-page-node-id="pendingTab01"></button>
+    <button class="tab" id="tab-approval" type="button" data-page-node-id="approvalTab01"></button>
+  </div>
+
+  <!-- ================= 工资管理 ================= -->
+  <div class="view" id="view-salary" data-page-node-id="ExGoQiSGPLF180jfWVR2Z0">
+
+    <div class="lock-banner" id="sal-lock-banner" data-page-node-id="salLockBanner01">
+      <div class="lb-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3 M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z M12 15v2"/></svg></div>
+      <div class="lb-txt"><b id="sal-lock-title" data-page-node-id="salLockTitle01">工资金额已隐藏</b><span id="sal-lock-sub" data-page-node-id="salLockSub01">输入密码后可查看真实金额（防误触，非加密存储）</span></div>
+      <button class="btn btn-sm btn-primary" id="sal-lock-btn" type="button" data-page-node-id="salLockBtn01">查看真实数据</button>
+      <button class="btn btn-sm btn-ghost" id="sal-pwd-btn" type="button" data-page-node-id="salPwdBtn01" hidden>修改密码</button>
+    </div>
+
+    <div class="kpis" data-page-node-id="xXg08Zi9nGwn6C0QFvubTW">
+      <div class="kpi" data-page-node-id="2GZnL5DMOOTGYqIzAOLshx"><div class="k" data-page-node-id="Vt9dew5LGuACHxmo4zdksU">应发合计</div><div class="v" id="sal-kpi-due" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="WqVGWwQHA4Jyb3mlrsEAFm">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="F2TMxWvoclRhEThdSJzn6O"><div class="k" data-page-node-id="ayYUjwGoph3ZGEEmjiVoHq">已发合计</div><div class="v pos" id="sal-kpi-paid" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="mDkndizjfVDG80MbqruULo">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="QqUc2858LQt0oE2os3AVjn"><div class="k" data-page-node-id="oLJhBC9DJODyrRw1zkqpPR">未发合计</div><div class="v neg" id="sal-kpi-unpaid" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="9sO9AzrpC3kV9TpP6ejYu4">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="8q2MWWsMoKn9yblKpthMbu"><div class="k" data-page-node-id="llbVrtYEieaS65wqkt5I4V">发放完成率</div><div class="v brand" id="sal-kpi-rate" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="VWzjLwnG0WkVShMXT1A2h7">0%</div></div>
+    </div>
+
+    <div class="card" data-page-node-id="m3TREiNA6Gybas6fNNFLql">
+      <div class="ctl" data-page-node-id="VymofL3AmXRpVTWWkdK8ck">
+        <div class="seg" id="sal-scope" data-page-node-id="WiX2FANnhUpz4cHo8msDrY">
+          <button type="button" data-scope="month" class="on" data-page-node-id="gvUI38hq0E3U2CXoyEEDbv">按月</button>
+          <button type="button" data-scope="year" data-page-node-id="LvWye0kKvoTZjqDdYjVVya">按年</button>
+          <button type="button" data-scope="total" data-page-node-id="eceNsYxrHCD7YExFINJiMI">总计</button>
+        </div>
+        <label class="fld" style="min-width:130px" data-page-node-id="LErLM4kqBiFf9jHUaOSgXs">年份
+          <select id="sal-year" data-page-node-id="JKlYkkeEQmKPECZgG1DxgV"><option value="" data-page-node-id="q1z8KdEv08WCVPJEtPMRuJ">全部年份</option></select>
+        </label>
+        <button class="btn btn-sm" id="sal-refill" type="button" style="margin-left:auto" data-page-node-id="d6eaDEPtR5xtxHE9XHcPDd">按差额回填未发</button>
+      </div>
+
+      <div class="charts-row">
+        <div class="charts" data-page-node-id="G79Qcc0p76g8uAoXAF8Sz7">
+          <div class="chart-box" data-page-node-id="oNLt1y0EUCwj3B9VyTJ5vQ">
+            <h4 data-page-node-id="qZygoOabjs24O1fdMB8fRu">工资月度趋势</h4>
+            <div class="cs" id="sal-trend-sub" data-page-node-id="QDXDlgyfZ9W562zY61xrDe">应发与已发对比</div>
+            <div id="sal-trend" data-page-node-id="CQQKLCqyNEqSqkjhrbStzJ"></div>
+            <div class="legend" data-page-node-id="U4CaCDrmISYC6EcHE4DJtH">
+              <span data-page-node-id="pFSH2brmjBQ6lDGySpPEXc"><i style="background:var(--brand)" data-page-node-id="DtrGPmMbiJJztRzvkHCxnN"></i>应发工资</span>
+              <span data-page-node-id="VpyBU3nIMQPvLNv6cKzlIz"><i style="background:var(--income)" data-page-node-id="hzAkjNtHk4NkLcS5wevuWT"></i>已发金额</span>
+            </div>
+          </div>
+          <div class="chart-box" data-page-node-id="H7loGdoCl1xPD3AT6RrV2h">
+            <h4 data-page-node-id="3SkcCva3ADyfmlLaGbbMWP">发放结构</h4>
+            <div class="cs" data-page-node-id="mN880XTICYoqKllMQxI67Z">已发与未发占比</div>
+            <div id="sal-pie" data-page-node-id="G8tyRDsolM4Pf3SRQ2IGoz"></div>
+            <div class="legend" data-page-node-id="XxYXxuP0QCFgvVhNiDKUv8">
+              <span data-page-node-id="E7EbMDY3w37guSM8dhAXJS"><i style="background:var(--income)" data-page-node-id="NWlBAeqyGo4ZJOrZQqx0h7"></i>已发</span>
+              <span data-page-node-id="AjhaqYPPZ7XW2mJ32l6DAG"><i style="background:var(--expense)" data-page-node-id="dBeBxEK6jBShwkDyzkYyBJ"></i>未发</span>
+            </div>
+          </div>
+        </div>
+        <div class="float-panel hidden" id="sal-float" data-page-node-id="salFloat01">
+          <div class="float-card" data-page-node-id="salFloatDue01"><div class="fk">筛选后应发</div><div class="fv" id="sal-float-due">¥0.00</div><div class="hint" id="sal-float-due-hint">—</div></div>
+          <div class="float-card income" data-page-node-id="salFloatPaid01"><div class="fk">筛选后已发</div><div class="fv" id="sal-float-paid">¥0.00</div><div class="hint" id="sal-float-paid-hint">—</div></div>
+          <div class="float-card expense" data-page-node-id="salFloatUnpaid01"><div class="fk">筛选后未发</div><div class="fv" id="sal-float-unpaid">¥0.00</div><div class="hint" id="sal-float-unpaid-hint">—</div></div>
+          <div class="float-card brand" data-page-node-id="salFloatRate01"><div class="fk">筛选后发放率</div><div class="fv" id="sal-float-rate">0%</div><div class="hint">当前筛选条件</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-page-node-id="MzxTaaPwUDfxZQf5nQzZVR">
+      <div class="sec-h" data-page-node-id="vW1PCOvNhszBH2bOBhlbEh">
+        <h3 id="sal-table-title" data-page-node-id="GQFC0GOK6sqVHfFRfHvdXc">月度明细</h3>
+        <span class="hint" id="sal-table-hint" data-page-node-id="rLf5GXaZdJWmzuyDZK84E0"></span>
+      </div>
+      <div class="tbl-wrap" data-page-node-id="gEG6I93F05fgOERErRzKzy">
+        <table data-page-node-id="Utpb7w2bWQypYWDMDJL7GB">
+          <thead id="sal-thead" data-page-node-id="2DSDKozt26ghjoJqC3rukU"></thead>
+          <tbody id="sal-tbody" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="0Y7hJVKhjsrX0oLDdwLC57"></tbody>
+        </table>
+      </div>
+
+      <div class="sec-h" style="margin-top:22px" data-page-node-id="hUYi2WYm5v5cf8MTWwSma1"><h3 data-page-node-id="CXYvjxEdChAhrOhShe9wye">录入 / 补充工资</h3></div>
+      <div class="form" data-page-node-id="g6G3SFosoUSMMFBn3z3FhK">
+        <label class="fld" data-page-node-id="UIqrBjARmHgYLWZlY5yonH">月份<input type="text" id="sal-f-month" placeholder="2026-08" maxlength="7" data-page-node-id="grFIAd9GBhuVJhTmEl3uOk"></label>
+        <label class="fld" data-page-node-id="DIDRHyV7BoXNTDBiTqtbri">应发工资<input type="number" id="sal-f-due" placeholder="0.00" step="0.01" inputmode="decimal" data-page-node-id="3vC2idI3yFEqBarZqixLfm"></label>
+        <label class="fld" data-page-node-id="GIGB8dWPQaRpThMUmFlqzh">已发金额<input type="number" id="sal-f-paid" placeholder="0.00" step="0.01" inputmode="decimal" data-page-node-id="ac8sZCBabH1hOgH98uk6MG"></label>
+        <label class="fld" data-page-node-id="Nq0FbvDzVNcEtYrrq5ETYK">备注<input type="text" id="sal-f-note" placeholder="选填，如发放日期" data-page-node-id="SqWOddeo0530ddGg5DGTlu"></label>
+        <div style="grid-column:1/-1" data-page-node-id="H22lFHLmA9t5l3EHKpR3NV"><button class="btn btn-primary" id="sal-add" type="button" data-page-node-id="6sb5vA8wfTyvFEgcFd6vuo">添加月份记录</button></div>
+      </div>
+      <div class="note" data-page-node-id="XeVMYrxjD9keyo0aeCWO0N">「未发金额」与「发放状态」在添加时自动计算；如需人工纠错，可在表格行内点「编辑」直接改写任意字段。</div>
+    </div>
+  </div>
+
+  <!-- ================= 鼎知堂（门店收支） ================= -->
+  <div class="view" id="view-ledger" data-page-node-id="F14Ttio6YPUi4VjmN5mQhO">
+
+    <div class="kpis" data-page-node-id="1vFUX9831MZR1Wo2dTEH9i">
+      <div class="kpi" data-page-node-id="J0jx8zyN536zsGCC1JlD8t"><div class="k" data-page-node-id="HQbzYA98XVowCMkPUuuQbG">总收入</div><div class="v pos" id="led-kpi-in" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="8KWsiEyN1hLHSuTlb07jx2">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="bM0hOICSueFPM47Tb3vh6q"><div class="k" data-page-node-id="fCj3IfKASdi6Fv3zj8FnCi">总支出</div><div class="v neg" id="led-kpi-out" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="zIHLpJ8KdK0K36HWaNcg5K">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="jfBr1k7yAbSVbrUfnx8K1n"><div class="k" data-page-node-id="eyJOWtg7EOrFCAd7a8eBhC">净结余</div><div class="v" id="led-kpi-net" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="3Wu82cYLNMS3wAe7FHB9LA">¥0.00</div></div>
+      <div class="kpi" data-page-node-id="56Hqg4Q8A9NttpRUORQr8m"><div class="k" data-page-node-id="O5vC2mJdg5uIdvr1CjiDmS">微信收入占比</div><div class="v brand" id="led-kpi-wx" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="c4td3l7jEe9aUXHfLGlC74">0%</div></div>
+    </div>
+
+    <div class="card" data-page-node-id="S38lJvQHUzdHy8IqF8utyj">
+      <div class="ctl" data-page-node-id="ta1QDy4XrDXvWxNxwqYS2j">
+        <label class="fld" style="min-width:118px" data-page-node-id="84nLPyudkcGCqFdJgk9qOT">年份<select id="led-year" data-page-node-id="6863B6vpWm11rDYTLkBpC1"><option value="" data-page-node-id="2G6QRkTHC2EVquwhO4Ezpa">全部</option></select></label>
+        <label class="fld" style="min-width:118px" data-page-node-id="BiHpMp1gRBDAW6uW9hPPML">月份<select id="led-month" data-page-node-id="2byOdzyvheyxzBoF1R6Qqa"><option value="" data-page-node-id="eWhs71SkEftdUlOEIhi8qR">全部</option></select></label>
+        <label class="fld" style="min-width:118px" data-page-node-id="dgcDdqxuN8QjEUJOkhIE3u">类型<select id="led-type" data-page-node-id="YYoFfznKkkxROFqB7k1USl"><option value="" data-page-node-id="3EIx6KZDHNBGydHaGhF82j">全部</option><option data-page-node-id="CX5ez2CUra5VueVk9hQOgu">收入</option><option data-page-node-id="P9Pt0dwjgjIKDXuT7pmj0D">支出</option></select></label>
+        <label class="fld" style="min-width:130px" data-page-node-id="lI3GimSZlR28UVXhgd7teH">渠道<select id="led-channel" data-page-node-id="0lrj4bS3WDcBbQO1fE70NH"><option value="" data-page-node-id="10PAKLpEsoFRA22WDBu12q">全部</option></select></label>
+        <button class="btn btn-sm btn-ghost" id="led-reset" type="button" data-page-node-id="WdXPYQMjXIo2Vj9qQ52NhF">重置</button>
+      </div>
+
+      <div class="charts-row">
+        <div class="charts charts-duo" data-page-node-id="3bviSgyhDnMqZt2OTtFPaJ">
+          <div class="chart-box" data-page-node-id="J1SDRDzT0IbRPxyWqLOfDB">
+            <h4 data-page-node-id="yFDToUPLKvZ2eLy7U8SXNe">月度收支对比</h4>
+            <div class="cs" id="led-trend-sub" data-page-node-id="FxVGZznowrmXQO8oyWDIeX">收入与支出分组对比</div>
+            <div id="led-trend" data-page-node-id="HTNwaO2ngNmlpGuzydGjWz"></div>
+            <div class="legend" data-page-node-id="eHY71ADC1nrQCrn34Pj2Rb">
+              <span data-page-node-id="91jMqrwcU88A5CeWsDJj3Y"><i style="background:var(--income)" data-page-node-id="MlSMNrDjinCztcpMlDDcoF"></i>收入</span>
+              <span data-page-node-id="FbX3aYumYidBIqjPFbPypi"><i style="background:var(--expense)" data-page-node-id="cqLWotBBGNhyn4D8ixHo4L"></i>支出</span>
+            </div>
+          </div>
+          <div class="chart-box" data-page-node-id="ktqeFu98OLXuRAw7cMHCCd">
+            <h4 data-page-node-id="8sMIFejnCPzr18bBGHt1QS">收入渠道分布</h4>
+            <div class="cs" data-page-node-id="dumzd540uYbbmgZDE6FOQb">按收入金额占比</div>
+            <div id="led-pie" data-page-node-id="6qQs6vPtcro00gDD2wqOIx"></div>
+            <div class="legend" id="led-pie-legend" data-page-node-id="UKVXZKEQkT648PGQxB4V5j"></div>
+          </div>
+          <div class="chart-box span-all" data-page-node-id="s1E1ymUxdMPahLUDHHuxP2">
+            <h4 data-page-node-id="gjmh37YQGP1Op4uJMXtlYw">支出分类榜</h4>
+            <div class="cs" data-page-node-id="It48sJ2YVbtT8UP5hpydZR">按支出金额降序</div>
+            <div class="catbar" id="led-catbar" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="cbaKdGs3eY7fqLdwCUENrQ"></div>
+          </div>
+        </div>
+        <div class="float-panel hidden" id="led-float" data-page-node-id="ledFloat01">
+          <div class="float-card income" data-page-node-id="ledFloatIn01"><div class="fk">筛选后收入</div><div class="fv" id="led-float-in">¥0.00</div><div class="hint" id="led-float-in-hint">—</div></div>
+          <div class="float-card expense" data-page-node-id="ledFloatOut01"><div class="fk">筛选后支出</div><div class="fv" id="led-float-out">¥0.00</div><div class="hint" id="led-float-out-hint">—</div></div>
+          <div class="float-card net" data-page-node-id="ledFloatNet01"><div class="fk">筛选后净结余</div><div class="fv" id="led-float-net">¥0.00</div><div class="hint" id="led-float-net-hint">—</div></div>
+          <div class="float-card brand" data-page-node-id="ledFloatCount01"><div class="fk">筛选后笔数</div><div class="fv" id="led-float-count">0</div><div class="hint">当前筛选条件</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-page-node-id="aHbuSDzT18zcakjz4psM03">
+      <div class="sec-h" data-page-node-id="wBmNBDoIWU162jRtSGh25x">
+        <h3 data-page-node-id="RwZtFIefBbG8ovvKF2fg6Q">收支流水</h3>
+        <span class="hint" id="led-count" data-page-node-id="JkEunmlJ3iJ8bpUWTYMOux"></span>
+      </div>
+      <div class="ctl" id="led-table-ctl" data-page-node-id="ledTableCtl01">
+        <label class="fld" style="min-width:118px" data-page-node-id="ltcY01">年份<select id="led-table-year" data-page-node-id="ltcYSel01"><option value="" data-page-node-id="ltcY0A">全部</option></select></label>
+        <label class="fld" style="min-width:118px" data-page-node-id="ltcM01">月份<select id="led-table-month" data-page-node-id="ltcMSel01"><option value="" data-page-node-id="ltcM0A">全部</option></select></label>
+        <label class="fld" style="min-width:118px" data-page-node-id="ltcTp01">类型<select id="led-table-type" data-page-node-id="ltcTpSel01"><option value="" data-page-node-id="ltcTp0A">全部</option><option data-page-node-id="ltcTpIn">收入</option><option data-page-node-id="ltcTpOut">支出</option></select></label>
+        <label class="fld" style="min-width:130px" data-page-node-id="ltcCh01">渠道<select id="led-table-channel" data-page-node-id="ltcChSel01"><option value="" data-page-node-id="ltcCh0A">全部</option></select></label>
+        <label class="fld" style="min-width:130px" data-page-node-id="ltcCat01">分类<select id="led-table-category" data-page-node-id="ltcCatSel01"><option value="" data-page-node-id="ltcCat0A">全部</option></select></label>
+        <button class="btn btn-sm btn-primary" id="led-table-query" type="button" data-page-node-id="ltcQuery01">查询</button>
+        <button class="btn btn-sm btn-ghost" id="led-table-reset" type="button" data-page-node-id="ltcReset01">重置</button>
+        <span class="hint" style="margin-left:auto" data-page-node-id="ltcHint01">仅影响下方表格，不影响顶部图表与全局 KPI</span>
+      </div>
+      <div class="tbl-wrap" data-page-node-id="mqsKm5O1UYEgQaW35HcbM5">
+        <table data-page-node-id="dkvOEPytz3uQpVCj8A1DzL">
+          <thead data-page-node-id="ik3DMz3BcQpPaKHe8WsqqW">
+            <tr data-page-node-id="uFRgqk1KkmWBp2oYfe7WQO"><th class="ck" data-page-node-id="ledCkTh01"><input type="checkbox" id="led-selall" class="ck" data-selall="ledger"></th><th data-page-node-id="FWjIPiXMWoLmDszTIOKdXu">日期</th><th data-page-node-id="j9YQSqik71KUbxDH7Rpv6g">摘要</th><th data-page-node-id="h67B0CEJmyFtUVgpsV2Nea">类型</th><th data-page-node-id="1oC1Ns1aBIaNGQfdJsOlji">渠道</th><th data-page-node-id="tBRHxohMMlLPMGBFiHhKLJ">分类</th><th class="num" data-page-node-id="99eRtVfGK8i5f6XXEGhv2Y">金额</th><th data-page-node-id="GkC5WG3HUXi8rThXYp4PGl">来源</th><th data-page-node-id="puPvu3tvepEITEPuHJOHoP"></th></tr>
+          </thead>
+          <tbody id="led-tbody" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="hAwgwbxz19FrBlnSCltj3Z"></tbody>
+        </table>
+      </div>
+
+      <div class="sec-h" style="margin-top:22px" data-page-node-id="TEAU1D8pt0WXYtcumHpLTM"><h3 data-page-node-id="2uPGc6LRYtgPO5qWyHim5b">录入一笔</h3></div>
+      <div class="form" data-page-node-id="uBluGxnRqEogpdePzvwIz4">
+        <label class="fld" data-page-node-id="EnmFir85DXiow2CPhOESap">交易时间<input type="date" id="led-f-date" data-page-node-id="5IKxvGamqASmaNidqxnD1Y"></label>
+        <label class="fld" data-page-node-id="DzAbyhY1pzp9sUcV1pICqb">收支类型<select id="led-f-type" data-page-node-id="9f6UNIIy8LK7UduNOtOvEP"></select></label>
+        <label class="fld" data-page-node-id="09b5y8lbRc93dD8Gx7ogjP">渠道<select id="led-f-channel" data-page-node-id="5tuoprfmk9o6gsv5OpWxcC"></select></label>
+        <label class="fld" data-page-node-id="xnDnI5mdpi0EuZnciWgcYP">分类<select id="led-f-cat" data-page-node-id="GOld2bEgf3GEZ1u70LRAv8"></select></label>
+        <label class="fld span2" data-page-node-id="syIKoigbEDfPHJKENxO47V">金额（正数）<input type="number" id="led-f-amt" placeholder="0.00" step="0.01" inputmode="decimal" data-page-node-id="zcNoaDpHGNYDEl5w1PRKgt"></label>
+        <label class="fld span2" data-page-node-id="CAWAoytCEj8tq4FIhvl0iX">摘要<input type="text" id="led-f-title" placeholder="如：客户到店消费 / 采购耗材" data-page-node-id="BoS4ZNxSurZJanYrck9yFD"></label>
+        <label class="fld span2" data-page-node-id="E8pgZru3Eh4qghh0p4tvJS">备注<input type="text" id="led-f-note" placeholder="选填，如原始行号、截图批次" data-page-node-id="F9FXi4K7lzpkxaWnEWlaqY"></label>
+        <div style="grid-column:1/-1" data-page-node-id="TPX91cd23jnpO5VUEnNp2U"><button class="btn btn-primary" id="led-add" type="button" data-page-node-id="YnvTGneVYMxvdc1W90Dg2D">添加流水</button></div>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <!-- ================= 导入中心 ================= -->
+  <div class="view" id="view-import" data-page-node-id="impViewNode01">
+    <button class="btn btn-sm btn-ghost" id="import-back" type="button" data-page-node-id="impBack01" hidden style="margin-bottom:14px">‹ 返回</button>
+    <div class="card" data-page-node-id="impCardTd01">
+      <div class="sec-h" data-page-node-id="impSecTd01"><h3 data-page-node-id="impHdTd01">腾讯文档表格导入</h3><span class="hint" data-page-node-id="impHintTd01">粘贴腾讯文档在线表格链接，自动读取并生成门店报表</span></div>
+      <div class="importer" data-page-node-id="impBoxTd01">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px" data-page-node-id="impT1">方式一 · 链接自动读取</div>
+        <div class="imp-2col">
+          <label class="fld" style="margin:0">腾讯文档链接
+            <input type="url" id="td-link" placeholder="https://docs.qq.com/sheet/... 或 https://doc.weixin.qq.com/..." >
+          </label>
+          <button class="btn btn-primary" id="td-read" type="button">读取并生成报表</button>
+        </div>
+        <div class="note" data-page-node-id="impNote1">提示：已「发布为网页 / 所有人可查看」的文档可直接读取；未公开文档受登录与浏览器跨域限制，请用方式二（最稳）。</div>
+      </div>
+      <div class="importer" style="margin-top:13px" data-page-node-id="impBoxTd02">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px" data-page-node-id="impT2">方式二 · 粘贴表格内容（最稳）</div>
+        <div class="muted" style="font-size:12.5px;margin-bottom:8px" data-page-node-id="impMuted2">在腾讯文档中选中表格区域复制（或「导出为 CSV」后打开复制），粘贴到下方，系统自动识别列：<code>日期,渠道,收支类型,分类,金额,摘要</code></div>
+        <textarea id="td-paste" placeholder="直接 Ctrl / Cmd + V 粘贴复制的表格（支持 Excel / 腾讯文档复制与 CSV）"></textarea>
+        <div style="margin-top:10px" data-page-node-id="impPasteBtn"><button class="btn btn-sm btn-primary" id="td-paste-import" type="button">解析并导入</button></div>
+      </div>
+    </div>
+
+    <div class="card" data-page-node-id="impCardCsv01">
+      <div class="sec-h" data-page-node-id="impSecCsv01"><h3 data-page-node-id="impHdCsv01">CSV 文件导入</h3><span class="hint" data-page-node-id="impHintCsv01">后台导出的表格，列顺序不限，自动识别表头</span></div>
+      <div class="importer" data-page-node-id="impBoxCsv01">
+        <input type="file" id="csv-file" accept=".csv,.txt" style="min-height:auto;padding:8px;font-size:14px">
+        <div id="csv-stage" data-page-node-id="impCsvStage" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="card" data-page-node-id="impCardPaste01">
+      <div class="sec-h" data-page-node-id="impSecPaste01"><h3 data-page-node-id="impHdPaste01">批量文本粘贴</h3><span class="hint" data-page-node-id="impHintPaste01">每行一笔，逗号分隔</span></div>
+      <div class="importer" data-page-node-id="impBoxPaste01">
+        <textarea id="paste-box" placeholder="2026-08-12,微信,收入,服务收入,1280,客户到店消费&#10;2026-08-13,支付宝,支出,采购成本,360,采购耗材"></textarea>
+        <div style="margin-top:10px" data-page-node-id="impPasteBtn2"><button class="btn btn-sm btn-primary" id="paste-import" type="button">解析并导入</button></div>
+      </div>
+    </div>
+
+    <div class="card" data-page-node-id="impCardMap01">
+      <div class="sec-h" data-page-node-id="impSecMap01"><h3 data-page-node-id="impHdMap01">字段映射与预览</h3><span class="hint" data-page-node-id="impHintMap01">确认后自动刷新门店收支报表</span></div>
+      <div id="import-stage" data-page-node-id="impStage01"><div class="empty">选择一种导入方式后，这里会显示列映射与预览。</div></div>
+    </div>
+
+    <div class="card" data-page-node-id="impCardMaint01">
+      <div class="sec-h" data-page-node-id="impSecMaint01"><h3 data-page-node-id="impHdMaint01">数据维护</h3></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap" data-page-node-id="impMaintBtns">
+        <button class="btn btn-sm btn-danger" id="btn-clear-demo" type="button" data-page-node-id="impClearDemo">清空示例数据</button>
+        <button class="btn btn-sm btn-danger" id="btn-clear-all" type="button" data-page-node-id="impClearAll">清空全部流水</button>
+      </div>
+      <div class="note" data-page-node-id="impNoteMaint"><strong data-page-node-id="impNoteMaintB">关于截图识别：</strong>单文件页面无法内置 OCR，截图请直接在对话中发给我，由我读取后写入本表，来源标记「截图识别」。</div>
+    </div>
+
+    <div class="card" id="card-sources" data-page-node-id="impCardSources01">
+      <div class="sec-h" data-page-node-id="impSecSources01"><h3 data-page-node-id="impHdSources01">数据源设置</h3><span class="hint" data-page-node-id="impHintSources01">管理腾讯文档与本地文档来源，可启停或删除</span></div>
+
+      <h4 style="font-size:14px;margin:6px 0 10px" data-page-node-id="settingsSubTencent01">腾讯文档数据源</h4>
+      <div class="src-list" id="src-tencent-list" data-page-node-id="srcTencentList01"></div>
+      <div class="add-src" data-page-node-id="addTencentBox01">
+        <label class="fld" style="flex:2 1 220px">名称<input type="text" id="add-tencent-name" placeholder="如：门店流水表" data-page-node-id="addTencentName01"></label>
+        <label class="fld" style="flex:3 1 280px">腾讯文档链接<input type="url" id="add-tencent-url" placeholder="https://docs.qq.com/sheet/..." data-page-node-id="addTencentUrl01"></label>
+        <button class="btn btn-sm btn-primary" id="add-tencent-btn" type="button" data-page-node-id="addTencentBtn01" style="margin-top:auto">添加</button>
+      </div>
+
+      <h4 style="font-size:14px;margin:22px 0 10px" data-page-node-id="settingsSubLocal01">本地文档路径</h4>
+      <div class="src-list" id="src-local-list" data-page-node-id="srcLocalList01"></div>
+      <div class="add-src" data-page-node-id="addLocalBox01">
+        <label class="fld" style="flex:2 1 220px">名称<input type="text" id="add-local-name" placeholder="如：年度工资表" data-page-node-id="addLocalName01"></label>
+        <label class="fld" style="flex:3 1 280px">本地路径<input type="text" id="add-local-path" placeholder="/Users/.../工资表.xlsx" data-page-node-id="addLocalPath01"></label>
+        <button class="btn btn-sm btn-primary" id="add-local-btn" type="button" data-page-node-id="addLocalBtn01" style="margin-top:auto">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 待处理 ================= -->
+  <div class="view on" id="view-pending" data-page-node-id="pendingView01">
+    <div class="card" data-page-node-id="pendingCard01">
+      <div class="sec-h" data-page-node-id="pendingSec01"><h3 data-page-node-id="pendingHd01">待处理事项</h3><span class="hint" id="pending-count" data-page-node-id="pendingCount01"></span></div>
+      <div class="tlist" id="pending-list" data-sp-bindable="database" data-sp-database-id="xJNqgBk1RD31ifcQy2pzLu" data-page-node-id="pendingList01"></div>
+    </div>
+  </div>
+
+  <!-- ================= 报销审批 ================= -->
+  <div class="view" id="view-approval" data-page-node-id="approvalView01">
+    <div class="card" id="approval-guest" data-page-node-id="approvalGuest01" hidden>
+      <div class="empty lock-placeholder" style="padding:34px 10px">
+        <div class="lock-icon"><svg viewBox="0 0 24 24" class="ic" style="width:34px;height:34px" aria-hidden="true"><path d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1ZM7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div style="font-weight:650;margin:12px 0 4px;font-size:16px">登录后使用报销审批</div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:16px">账号由管理员统一开通并分配角色，不开放自助注册<br>发起报销、审批、留痕都需要先登录</div>
+        <button class="btn btn-primary" id="approval-guest-login" type="button">登录账号</button>
+      </div>
+    </div>
+
+    <div id="approval-main" hidden>
+      <div class="sec-h" style="margin-bottom:14px" data-page-node-id="apTopBar01">
+        <div class="hint" style="font-size:12.5px" data-page-node-id="apRoleHint01">当前账号：<b id="ap-current-name"></b> <span id="ap-current-roles" style="color:var(--text-3)"></span></div>
+        <button class="btn btn-sm" id="ap-admin-entry" type="button" hidden data-page-node-id="apAdminEntry01">账号与权限管理</button>
+      </div>
+
+      <div class="kpis" data-page-node-id="approvalKpis01">
+        <div class="kpi" data-page-node-id="apKpiTodo"><div class="k">待我审批</div><div class="v brand" id="ap-kpi-todo">0</div></div>
+        <div class="kpi" data-page-node-id="apKpiMine"><div class="k">我发起的（审批中）</div><div class="v" id="ap-kpi-mine" style="color:var(--warn)">0</div></div>
+        <div class="kpi" data-page-node-id="apKpiDone"><div class="k">本月已通过</div><div class="v pos" id="ap-kpi-done">¥0.00</div></div>
+        <div class="kpi" data-page-node-id="apKpiRej"><div class="k">本月已驳回</div><div class="v neg" id="ap-kpi-rej">0</div></div>
+      </div>
+
+      <div class="card" id="ap-form-card" data-page-node-id="apFormCard01">
+        <div class="sec-h" data-page-node-id="apFormSec01"><h3 data-page-node-id="apFormHd01">发起报销</h3><span class="hint" data-page-node-id="apFormHint01">需具备「发起人」角色；支持一级、二级审核</span></div>
+        <div class="form" data-page-node-id="apForm01">
+          <label class="fld" data-page-node-id="apFTitle">事由 / 摘要<input type="text" id="ap-f-title" placeholder="如：8月门店耗材采购" maxlength="60"></label>
+          <label class="fld" data-page-node-id="apFAmount">报销金额（元）<input type="number" id="ap-f-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></label>
+          <label class="fld" data-page-node-id="apFCategory">费用分类
+            <select id="ap-f-category">
+              <option value="采购成本">采购成本</option>
+              <option value="房租水电">房租水电</option>
+              <option value="营销推广">营销推广</option>
+              <option value="设备维护">设备维护</option>
+              <option value="人员工资">人员工资 / 差旅</option>
+              <option value="其他支出">其他</option>
+            </select>
+          </label>
+          <label class="fld" data-page-node-id="apFApprover">一级审批人 <span style="color:var(--expense)">*</span>
+            <select id="ap-f-approver"></select>
+          </label>
+          <label class="fld" data-page-node-id="apFApprover2">二级审批人（可选，二次审核）
+            <select id="ap-f-approver2"></select>
+          </label>
+          <label class="fld span2" data-page-node-id="apFNote">备注（选填）<input type="text" id="ap-f-note" placeholder="发票号、支付方式等补充说明" maxlength="120"></label>
+          <div style="grid-column:1/-1" data-page-node-id="apFSubmit"><button class="btn btn-primary" id="ap-submit" type="button">提交报销申请</button></div>
+        </div>
+        <div class="note" data-page-node-id="apNote01">提交后先由<b>一级审批人</b>审核；若设置了二级审批人，一级通过后流转至二级，两级均通过才算完成；任一级驳回即驳回。已完成单据完整记录发起人、各审批人、金额、时间与每级意见，报销与发薪有据可查。</div>
+      </div>
+
+      <div class="card" data-page-node-id="apListCard01">
+        <div class="sec-h" data-page-node-id="apListSec01">
+          <h3 data-page-node-id="apListHd01">报销单</h3>
+          <div class="seg" id="ap-seg" data-page-node-id="apSeg01">
+            <button type="button" data-apseg="todo" class="on" data-page-node-id="apSegTodo">待审批</button>
+            <button type="button" data-apseg="mine" data-page-node-id="apSegMine">我发起的</button>
+            <button type="button" data-apseg="done" data-page-node-id="apSegDone">已完成</button>
+          </div>
+        </div>
+        <div class="tbl-wrap" data-page-node-id="apTblWrap01">
+          <table data-page-node-id="apTable01">
+            <thead id="ap-thead" data-page-node-id="apThead01"></thead>
+            <tbody id="ap-tbody" data-page-node-id="apTbody01"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="batch-bar" id="batch-bar" hidden data-page-node-id="batchBar01">
+  <span id="batch-count" data-page-node-id="batchCount01">已选 0 条</span>
+  <div class="batch-acts" id="batch-acts" data-page-node-id="batchActs01"></div>
+</div>
+
+<div class="mask" id="modal" hidden data-page-node-id="nD8CyDjwTcgSfHbWVpelKe">
+  <div class="modal" data-page-node-id="aKZbfjnSUEZEigX334kBsx">
+    <div class="mhead" data-page-node-id="oCfbgmOjdsrW5XKObeiM2Z"><h3 id="modal-title" data-page-node-id="U5h1ByEbuCSoZATPzQrHOK">编辑</h3>
+      <button class="btn btn-sm btn-ghost" id="modal-x" type="button" aria-label="关闭" data-page-node-id="FDMYLzmUDPedg3TJDCz8xw">关闭</button></div>
+    <div class="mbody" id="modal-body" data-page-node-id="292OP2RMj8iDCXBh0T0PmD"></div>
+    <div class="mfoot" data-page-node-id="kjNA42pjGV2L7twbxQWxTD">
+      <button class="btn" id="modal-cancel" type="button" data-page-node-id="VOyfll3lqNJDU24RjRhgsH">取消</button>
+      <button class="btn btn-primary" id="modal-save" type="button" data-page-node-id="X7GEhvH1EulzYYCUNxAvNM">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden data-page-node-id="OOHu2D0InJg4dbjr3nnfH0"></div>
+<input type="file" id="json-file" accept=".json,application/json" style="display:none" data-page-node-id="peCjBRH0HuLYDORbY4q7yN">
+
+<script>
+(function(){
+'use strict';
+
+var DB_SALARY = 'xJNqgBk1RD31ifcQy2pzLu';
+var DB_LEDGER = 'VhotoVgDEpeywLkYTiKoeW';
+
+var ICONS = {
+  plus:'M12 5v14M5 12h14',
+  pencil:'M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z',
+  trash:'M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6',
+  down:'M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14',
+  up:'M12 16V5M7.5 9.5 12 5l4.5 4.5M5 20h14',
+  sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4',
+  moon:'M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z',
+  alert:'M12 3 2 20h20L12 3ZM12 9v5M12 17.5v.6',
+  lock:'M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1ZM7 11V7a5 5 0 0 1 10 0v4',
+  back:'M15 18l-6-6 6-6',
+  user:'M20 21a8 8 0 1 0-16 0 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  check:'M20 6 9 17l-5-5',
+  xmark:'M18 6 6 18M6 6l12 12',
+  shield:'M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z M9.5 12l2 2 3.5-3.5',
+  logout:'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
+  gear:'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8.5-3c0 .17-.01.34-.04.5l1.74 1.36a.5.5 0 0 1 .12.64l-1.65 2.86a.5.5 0 0 1-.61.21l-2.05-.82a7.06 7.06 0 0 1-1.3.75l-.31 2.18a.5.5 0 0 1-.5.42h-3.3a.5.5 0 0 1-.5-.42l-.31-2.18a7.06 7.06 0 0 1-1.3-.75l-2.05.82a.5.5 0 0 1-.61-.21L2.68 14.5a.5.5 0 0 1 .12-.64L4.54 12.5c-.03-.16-.04-.33-.04-.5s.01-.34.04-.5L2.8 10.14a.5.5 0 0 1-.12-.64l1.65-2.86a.5.5 0 0 1 .61-.21l2.05.82a7.06 7.06 0 0 1 1.3-.75l.31-2.18A.5.5 0 0 1 9.2 3.5h3.3a.5.5 0 0 1 .5.42l.31 2.18a7.06 7.06 0 0 1 1.3.75l2.05-.82a.5.5 0 0 1 .61.21l1.65 2.86a.5.5 0 0 1-.12.64l-1.74 1.36c.03.16.04.33.04.5Z'
+};
+
+var state = {
+  tab: 'pending',
+  status: 'loading',
+  salary: [],
+  ledger: [],
+  salaryOpts: {},
+  ledgerOpts: {},
+  salScope: 'month',
+  salYear: '',
+  ledYear: '', ledMonth: '', ledType: '', ledChannel: '',
+  ledTableYear: '', ledTableMonth: '', ledTableType: '', ledTableChannel: '', ledTableCategory: '',
+  csv: null,
+  modalSubmit: null,
+  salaryUnlocked: false,
+  salaryPwd: '',
+  pendingUnlocked: false,
+  selSal: {},
+  selLed: {},
+  tdPreview: null,
+  sources: [],
+  /* 账号体系 */
+  users: [],
+  currentUser: null,
+  /* 审批体系 */
+  approvals: [],
+  apSeg: 'todo'
+};
+
+var CAT_TYPE = {
+  '服务收入':'收入','产品收入':'收入','会员充值':'收入','其他收入':'收入',
+  '采购成本':'支出','人员工资':'支出','房租水电':'支出','营销推广':'支出','设备维护':'支出','其他支出':'支出'
+};
+var CHANNEL_COLOR = {'微信':'#12A05C','支付宝':'#3B6EF5','现金':'#D97B08','银行卡':'#8B5CF6','其他':'#8B93A7'};
+
+/* ============ 基础工具 ============ */
+function icon(n, cls){ return '<svg class="ic ' + (cls||'') + '" viewBox="0 0 24 24" aria-hidden="true"><path d="' + ICONS[n] + '"/></svg>'; }
+function $(id){ return document.getElementById(id); }
+function num(v){ var n = parseFloat(v); return isFinite(n) ? n : 0; }
+function fmtMoney(v){
+  var n = num(v), s = Math.abs(n).toFixed(2), p = s.split('.');
+  p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (n < 0 ? '-¥' : '¥') + p.join('.');
+}
+function esc(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function dateOnly(v){ return String(v == null ? '' : v).slice(0,10); }
+function dateTodayStr(){
+  var d = new Date(), m = d.getMonth() + 1, day = d.getDate();
+  return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+}
+function monthKey(v){ return String(v == null ? '' : v).slice(0,7); }
+function todayMonth(){
+  var d = new Date(), m = d.getMonth() + 1;
+  return d.getFullYear() + '-' + (m < 10 ? '0' + m : m);
+}
+function setDBText(el, dbId, text){
+  if(!el) return;
+  el.textContent = text;
+  el.setAttribute('data-sp-bindable','database');
+  el.setAttribute('data-sp-database-id', dbId);
+}
+function toast(msg){
+  var t = $('toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(t._tm); t._tm = setTimeout(function(){ t.hidden = true; }, 2400);
+}
+/* ============ Cloudflare Pages 数据层适配（fetch → Worker /api/*） ============ */
+var TOKEN_KEY = 'cf_ws_token';
+function getToken(){ try{ return sessionStorage.getItem(TOKEN_KEY) || ''; }catch(e){ return ''; } }
+function setToken(t){ try{ if(t) sessionStorage.setItem(TOKEN_KEY, t); else sessionStorage.removeItem(TOKEN_KEY); }catch(e){} }
+
+function apiCall(path, opts){
+  opts = opts || {};
+  var t = getToken();
+  var h = { 'Content-Type': 'application/json' };
+  if(t) h['Authorization'] = 'Bearer ' + t;
+  return fetch(path, Object.assign({}, opts, { headers: h }))
+    .then(function(r){ return r.json().then(function(j){ return { httpOk: r.ok, status: r.status, body: j }; }); })
+    .catch(function(e){ return { httpOk: false, status: 0, body: { msg: '网络异常，请检查连接' } }; });
+}
+
+// 归一化记录：给 API 返回的记录补 _id（前端用 r._id 当记录 ID）
+function norm(r){ if(!r || !r.id) return r; r._id = r.id; return r; }
+function normArr(arr){ return arr ? arr.map(norm) : []; }
+
+function querySalaryFirst(){
+  return apiCall('/api/salary').then(function(r){
+    return { results: r.httpOk ? normArr(r.body.data) : [], hasMore: false, nextCursor: null };
+  });
+}
+function querySalaryNext(){ return { results: [], hasMore: false }; }
+function queryLedgerFirst(){
+  return apiCall('/api/ledger').then(function(r){
+    return { results: r.httpOk ? normArr(r.body.data) : [], hasMore: false, nextCursor: null };
+  });
+}
+function queryLedgerNext(){ return { results: [], hasMore: false }; }
+
+function paginate(firstFn, nextFn){
+  var all = [];
+  function collect(res){
+    var rs = (res && res.results) ? res.results : [];
+    all = all.concat(rs);
+    if(res && res.hasMore && all.length < 4000){
+      return nextFn(res.nextCursor).then(collect);
+    }
+    return all;
+  }
+  return firstFn().then(collect);
+}
+function offlineReject(){ return Promise.reject(new Error('offline')); }
+function sdkReady(){ return true; }
+
+function guardWrite(label, p){
+  return Promise.resolve(p);
+}
+var WRITE_FLAG = 'wb_dataws_write_pending';
+function markWrite(label){ try{ localStorage.setItem(WRITE_FLAG, JSON.stringify({ label: label || '提交', ts: Date.now() })); }catch(e){} }
+function clearWriteMark(){ try{ localStorage.removeItem(WRITE_FLAG); }catch(e){} }
+function readWriteMark(){
+  try{
+    var raw = localStorage.getItem(WRITE_FLAG);
+    if(!raw) return null;
+    var m = JSON.parse(raw);
+    if(!m || !m.ts || Date.now() - m.ts > 2*60*60*1000){ localStorage.removeItem(WRITE_FLAG); return null; }
+    return m;
+  }catch(e){ return null; }
+}
+
+function addSalaryRecord(props){
+  return apiCall('/api/salary', { method: 'POST', body: JSON.stringify(props) })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '写入失败'); return norm(Object.assign({}, props, { id: 'tmp_' + Date.now() })); });
+}
+function updateSalaryRecord(recordId, props){
+  return apiCall('/api/salary/' + encodeURIComponent(recordId), { method: 'PUT', body: JSON.stringify(props) })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '更新失败'); return norm(Object.assign({}, props, { id: recordId })); });
+}
+function deleteSalaryRecord(recordId){
+  return apiCall('/api/salary/' + encodeURIComponent(recordId), { method: 'DELETE' })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '删除失败'); });
+}
+function addLedgerRecord(props){
+  return apiCall('/api/ledger', { method: 'POST', body: JSON.stringify(props) })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '写入失败'); return norm(Object.assign({}, props, { id: 'tmp_' + Date.now() })); });
+}
+function updateLedgerRecord(recordId, props){
+  return apiCall('/api/ledger/' + encodeURIComponent(recordId), { method: 'PUT', body: JSON.stringify(props) })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '更新失败'); return norm(Object.assign({}, props, { id: recordId })); });
+}
+function deleteLedgerRecord(recordId){
+  return apiCall('/api/ledger/' + encodeURIComponent(recordId), { method: 'DELETE' })
+    .then(function(r){ if(!r.httpOk) throw new Error(r.body.msg || '删除失败'); });
+}
+function getSalarySchema(){ return Promise.resolve({ properties: [] }); }
+function getLedgerSchema(){ return Promise.resolve({ properties: [] }); }
+function addRecordOf(kind, props){ return kind === 'salary' ? addSalaryRecord(props) : addLedgerRecord(props); }
+function deleteRecordOf(kind, recordId){ return kind === 'salary' ? deleteSalaryRecord(recordId) : deleteLedgerRecord(recordId); }
+function loadSalaryData(){
+  return paginate(querySalaryFirst, querySalaryNext).then(function(rows){ state.salary = rows; });
+}
+function loadLedgerData(){
+  return paginate(queryLedgerFirst, queryLedgerNext).then(function(rows){ state.ledger = rows; });
+}
+function reloadAll(){ return loadSalaryData().then(loadLedgerData); }
+
+/* ============ 计算层 ============ */
+function salaryRowsSorted(){
+  return state.salary.slice().sort(function(a,b){
+    return String(a['月份']||'').localeCompare(String(b['月份']||''));
+  });
+}
+function filteredSalary(){
+  var rows = salaryRowsSorted();
+  if(state.salScope === 'total') return rows;
+  if(state.salYear) return rows.filter(function(r){ return String(r['月份']||'').slice(0,4) === state.salYear; });
+  return rows;
+}
+function salaryAgg(rows){
+  var a = { due:0, paid:0, unpaid:0, months:0 };
+  rows.forEach(function(r){
+    a.due += num(r['应发工资']);
+    a.paid += num(r['已发金额']);
+    a.unpaid += num(r['未发金额']);
+    a.months++;
+  });
+  return a;
+}
+function salaryYears(){
+  var m = {};
+  state.salary.forEach(function(r){ var y = String(r['月份']||'').slice(0,4); if(y) m[y] = 1; });
+  return Object.keys(m).sort().reverse();
+}
+function yearAggRows(){
+  var m = {}, order = [];
+  salaryRowsSorted().forEach(function(r){
+    var y = String(r['月份']||'').slice(0,4); if(!y) return;
+    if(!m[y]){ m[y] = { year:y, due:0, paid:0, unpaid:0, months:0 }; order.push(y); }
+    m[y].due += num(r['应发工资']);
+    m[y].paid += num(r['已发金额']);
+    m[y].unpaid += num(r['未发金额']);
+    m[y].months++;
+  });
+  return order.map(function(y){ return m[y]; });
+}
+function deriveStatus(due, paid){
+  if(paid <= 0.005) return '未发放';
+  if(paid >= due - 0.005) return '已结清';
+  return '部分发放';
+}
+
+/* ============ 工资隐私门 + 批量选择 辅助 ============ */
+function salMoney(v){ return state.salaryUnlocked ? fmtMoney(v) : '••••'; }
+function salPct(v){ return state.salaryUnlocked ? (v + '%') : '••%'; }
+function selectedIds(kind){
+  var s = kind === 'salary' ? state.selSal : state.selLed;
+  return Object.keys(s).filter(function(k){ return s[k]; });
+}
+function selRows(kind){
+  var ids = selectedIds(kind);
+  var src = kind === 'salary' ? state.salary : state.ledger;
+  return src.filter(function(r){ return ids.indexOf(r._id) !== -1; });
+}
+function clearSel(kind){
+  if(kind === 'salary') state.selSal = {}; else state.selLed = {};
+}
+function selAll(kind, rows){
+  var set = kind === 'salary' ? state.selSal : state.selLed;
+  rows.forEach(function(r){ if(r && r._id) set[r._id] = true; });
+}
+function syncSelAll(kind){
+  var head = kind === 'salary' ? $('sal-selall') : $('led-selall');
+  if(!head) return;
+  var rows = kind === 'salary' ? filteredSalary() : ledgerTableFiltered();
+  var set = kind === 'salary' ? state.selSal : state.selLed;
+  var total = rows.length, sel = 0;
+  rows.forEach(function(r){ if(set[r._id]) sel++; });
+  head.checked = (total > 0 && sel === total);
+  head.indeterminate = (sel > 0 && sel < total);
+}
+
+function ledgerFiltered(){
+  return state.ledger.filter(function(r){
+    var d = dateOnly(r['交易时间']);
+    if(state.ledYear && d.slice(0,4) !== state.ledYear) return false;
+    if(state.ledMonth && monthKey(d) !== state.ledMonth) return false;
+    if(state.ledType && r['收支类型'] !== state.ledType) return false;
+    if(state.ledChannel && r['渠道'] !== state.ledChannel) return false;
+    return true;
+  });
+}
+function ledgerTableFiltered(){
+  return state.ledger.filter(function(r){
+    var d = dateOnly(r['交易时间']);
+    if(state.ledTableYear && d.slice(0,4) !== state.ledTableYear) return false;
+    if(state.ledTableMonth && monthKey(d) !== state.ledTableMonth) return false;
+    if(state.ledTableType && r['收支类型'] !== state.ledTableType) return false;
+    if(state.ledTableChannel && r['渠道'] !== state.ledTableChannel) return false;
+    if(state.ledTableCategory && r['分类'] !== state.ledTableCategory) return false;
+    return true;
+  });
+}
+function ledgerAgg(rows){
+  var a = { income:0, expense:0, net:0, byChannel:{}, byCategory:{}, byMonth:{} };
+  rows.forEach(function(r){
+    var amt = num(r['金额']), isIn = r['收支类型'] === '收入';
+    if(isIn) a.income += amt; else a.expense += amt;
+    var mk = monthKey(r['交易时间']);
+    if(!a.byMonth[mk]) a.byMonth[mk] = { month:mk, income:0, expense:0 };
+    if(isIn) a.byMonth[mk].income += amt; else a.byMonth[mk].expense += amt;
+    if(isIn){
+      var ch = r['渠道'] || '其他';
+      a.byChannel[ch] = (a.byChannel[ch] || 0) + amt;
+    }else{
+      var ct = r['分类'] || '其他支出';
+      a.byCategory[ct] = (a.byCategory[ct] || 0) + amt;
+    }
+  });
+  a.net = a.income - a.expense;
+  return a;
+}
+function monthSeries(map){
+  return Object.keys(map).sort().map(function(k){ return map[k]; });
+}
+function ledgerYears(){
+  var m = {};
+  state.ledger.forEach(function(r){ var y = dateOnly(r['交易时间']).slice(0,4); if(y) m[y] = 1; });
+  return Object.keys(m).sort().reverse();
+}
+function ledgerMonthsOfYear(){
+  var m = {};
+  state.ledger.forEach(function(r){
+    var d = dateOnly(r['交易时间']);
+    if(state.ledYear && d.slice(0,4) !== state.ledYear) return;
+    var mk = monthKey(d); if(mk) m[mk] = 1;
+  });
+  return Object.keys(m).sort().reverse();
+}
+function ledgerTableMonthsOfYear(){
+  var m = {};
+  state.ledger.forEach(function(r){
+    var d = dateOnly(r['交易时间']);
+    if(state.ledTableYear && d.slice(0,4) !== state.ledTableYear) return;
+    var mk = monthKey(d); if(mk) m[mk] = 1;
+  });
+  return Object.keys(m).sort().reverse();
+}
+function buildTodayTasks(){
+  var tasks = [], tm = todayMonth();
+  salaryRowsSorted().forEach(function(r){
+    var m = String(r['月份']||''), unpaid = num(r['未发金额']);
+    if(m && m < tm && unpaid > 0.005){
+      tasks.push({ level:'overdue', db:'salary', id:r._id,
+        text:'【' + m + '】工资未结清，尚欠 ' + (state.salaryUnlocked ? fmtMoney(unpaid) : '••••'),
+        btn:'标记已结清', act:'settle' });
+    }
+  });
+  var hasThis = state.salary.some(function(r){ return String(r['月份']||'') === tm; });
+  if(!hasThis) tasks.push({ level:'todo', text:'本月（' + tm + '）工资尚未录入', btn:'去录入', act:'goto-salary' });
+  var pending = state.ledger.filter(function(r){ return r['数据来源'] === '截图识别'; });
+  if(pending.length) tasks.push({ level:'todo', text:'有 ' + pending.length + ' 笔「截图识别」流水待复核', btn:'去复核', act:'review-ocr' });
+  var thisMonthLedger = state.ledger.filter(function(r){ return monthKey(r['交易时间']) === tm; });
+  if(!thisMonthLedger.length) tasks.push({ level:'todo', text:'本月（' + tm + '）还没有门店流水记录', btn:'去录入', act:'goto-ledger' });
+  return tasks;
+}
+
+/* ============ SVG 图表 ============ */
+function emptyChart(msg){
+  return '<svg viewBox="0 0 400 200" role="img"><text x="200" y="104" text-anchor="middle" fill="var(--text-3)" font-size="13" font-family="inherit">' + esc(msg) + '</text></svg>';
+}
+function niceMax(v){
+  if(v <= 0) return 100;
+  var mag = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+  var n = v / mag;
+  var s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+  return s * mag;
+}
+function lineChart(series, labels){
+  if(!labels.length) return emptyChart('暂无数据，先录入几个月看看');
+  var W = 680, H = 260, pl = 60, pr = 16, pt = 16, pb = 36;
+  var max = 0;
+  series.forEach(function(s){ s.data.forEach(function(v){ if(v > max) max = v; }); });
+  max = niceMax(max * 1.12) || 100;
+  var iw = W - pl - pr, ih = H - pt - pb;
+  var n = labels.length;
+  var X = function(i){ return n <= 1 ? pl + iw/2 : pl + i * iw / (n - 1); };
+  var Y = function(v){ return pt + ih - (v / max) * ih; };
+  var defs = '<defs>' + series.map(function(s,i){
+    return '<linearGradient id="lcg'+i+'" x1="0" y1="0" x2="0" y2="1">' +
+           '<stop offset="0" stop-color="'+s.color+'" stop-opacity="0.30"/>' +
+           '<stop offset="1" stop-color="'+s.color+'" stop-opacity="0"/></linearGradient>';
+  }).join('') + '</defs>';
+  var g = '';
+  for(var i = 0; i <= 4; i++){
+    var yv = max * i / 4, yy = Y(yv);
+    g += '<line class="grid-dash" x1="' + pl + '" y1="' + yy.toFixed(1) + '" x2="' + (W-pr) + '" y2="' + yy.toFixed(1) + '" stroke-width="1"/>';
+    g += '<text x="' + (pl-10) + '" y="' + (yy+4).toFixed(1) + '" text-anchor="end" fill="var(--text-3)" font-size="11" font-family="inherit">' + shortNum(yv) + '</text>';
+  }
+  var step = Math.max(1, Math.ceil(n / 8));
+  for(var j = 0; j < n; j += step){
+    g += '<text x="' + X(j).toFixed(1) + '" y="' + (H-13) + '" text-anchor="middle" fill="var(--text-3)" font-size="11" font-family="inherit">' + esc(labels[j].slice(2)) + '</text>';
+  }
+  series.forEach(function(s, si){
+    var d = '', area = '', pts = '';
+    s.data.forEach(function(v, i){
+      var px = X(i).toFixed(1), py = Y(v).toFixed(1);
+      d += (i ? ' L' : 'M') + px + ',' + py;
+      area += (i ? ' L' : 'M') + px + ',' + py;
+      pts += '<circle cx="' + px + '" cy="' + py + '" r="7" fill="' + s.color + '" opacity="0.14"/>' +
+             '<circle cx="' + px + '" cy="' + py + '" r="3.4" fill="' + s.color + '" stroke="var(--surface)" stroke-width="1.6"/>';
+    });
+    var bl = (pt + ih).toFixed(1);
+    area += ' L' + X(n-1).toFixed(1) + ',' + bl + ' L' + X(0).toFixed(1) + ',' + bl + ' Z';
+    g += '<path d="' + area + '" fill="url(#lcg'+si+')" stroke="none"/>';
+    g += '<path class="line-anim" pathLength="1" d="' + d + '" fill="none" stroke="' + s.color + '" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>' + pts;
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + defs + g + '</svg>';
+}
+function shortNum(v){
+  if(v >= 10000) return (v/10000).toFixed(v % 10000 === 0 ? 0 : 1) + '万';
+  if(v >= 1000) return (v/1000).toFixed(v % 1000 === 0 ? 0 : 1) + 'k';
+  return String(Math.round(v));
+}
+function donutChart(parts, centerTop, centerBottom){
+  var total = 0;
+  parts.forEach(function(p){ total += num(p.value); });
+  if(total <= 0) return emptyChart('暂无数据');
+  var cx = 130, cy = 130, R = 82, sw = 30, S = 260;
+  var live = parts.filter(function(p){ return num(p.value) > 0; });
+  var g = '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="var(--surface-2)" stroke-width="'+sw+'"/>';
+  var gap = live.length > 1 ? 0.035 : 0;
+  if(live.length === 1){
+    g += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+live[0].color+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+  }else{
+    var a = -Math.PI / 2;
+    live.forEach(function(p){
+      var span = num(p.value) / total * Math.PI * 2;
+      var a1 = a + gap/2, a2 = a + span - gap/2;
+      var x1 = cx + R*Math.cos(a1), y1 = cy + R*Math.sin(a1);
+      var x2 = cx + R*Math.cos(a2), y2 = cy + R*Math.sin(a2);
+      var lg = (a2 - a1) > Math.PI ? 1 : 0;
+      g += '<path d="M'+x1.toFixed(2)+','+y1.toFixed(2)+' A'+R+','+R+' 0 '+lg+' 1 '+x2.toFixed(2)+','+y2.toFixed(2)+'" fill="none" stroke="'+p.color+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+      a = a + span;
+    });
+  }
+  g += '<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" fill="var(--text)" font-size="22" font-weight="760" letter-spacing="-.5" style="font-variant-numeric:tabular-nums" font-family="inherit">' + esc(centerTop) + '</text>';
+  g += '<text x="'+cx+'" y="'+(cy+19)+'" text-anchor="middle" fill="var(--text-3)" font-size="11.5" font-family="inherit">' + esc(centerBottom) + '</text>';
+  return '<svg viewBox="0 0 ' + S + ' ' + S + '" style="max-width:268px;margin:0 auto" role="img">' + g + '</svg>';
+}
+function barChart(rows){
+  if(!rows.length) return emptyChart('暂无数据，导入或录入流水后显示');
+  var W = 680, H = 260, pl = 60, pr = 16, pt = 18, pb = 36;
+  var max = 0;
+  rows.forEach(function(r){ max = Math.max(max, r.income, r.expense); });
+  max = niceMax(max * 1.18) || 100;
+  var iw = W - pl - pr, ih = H - pt - pb;
+  var n = rows.length, slot = iw / n, bw = Math.min(22, slot * 0.30);
+  var defs = '<defs>' +
+    '<linearGradient id="barIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--income-2)"/><stop offset="1" stop-color="var(--income)"/></linearGradient>' +
+    '<linearGradient id="barEx" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--expense-2)"/><stop offset="1" stop-color="var(--expense)"/></linearGradient>' +
+    '</defs>';
+  var g = '';
+  for(var i = 0; i <= 4; i++){
+    var yv = max * i / 4, yy = pt + ih - (yv/max)*ih;
+    g += '<line class="grid-dash" x1="' + pl + '" y1="' + yy.toFixed(1) + '" x2="' + (W-pr) + '" y2="' + yy.toFixed(1) + '" stroke-width="1"/>';
+    g += '<text x="' + (pl-10) + '" y="' + (yy+4).toFixed(1) + '" text-anchor="end" fill="var(--text-3)" font-size="11" font-family="inherit">' + shortNum(yv) + '</text>';
+  }
+  var showVal = n <= 14;
+  rows.forEach(function(r, i){
+    var cx = pl + slot * i + slot / 2;
+    var h1 = (r.income / max) * ih, h2 = (r.expense / max) * ih;
+    g += '<rect class="bar-g" x="' + (cx - bw - 2).toFixed(1) + '" y="' + (pt + ih - h1).toFixed(1) + '" width="' + bw + '" height="' + Math.max(h1,2).toFixed(1) + '" rx="5" fill="url(#barIn)"/>';
+    g += '<rect class="bar-g" x="' + (cx + 2).toFixed(1) + '" y="' + (pt + ih - h2).toFixed(1) + '" width="' + bw + '" height="' + Math.max(h2,2).toFixed(1) + '" rx="5" fill="url(#barEx)"/>';
+    if(showVal){
+      g += '<text class="bar-val" x="' + (cx - bw/2 - 2).toFixed(1) + '" y="' + (pt + ih - h1 - 5).toFixed(1) + '" text-anchor="middle" fill="var(--income)">' + shortNum(r.income) + '</text>';
+    }
+    g += '<text x="' + cx.toFixed(1) + '" y="' + (H-13) + '" text-anchor="middle" fill="var(--text-3)" font-size="11" font-family="inherit">' + esc(r.month.slice(2)) + '</text>';
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + defs + g + '</svg>';
+}
+function cssVar(n){
+  return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
+}
+
+/* ============ 渲染层（互不调用，仅由 refreshAll 调度） ============ */
+function renderStatus(){
+  var map = { loading:['loading','同步中…'], synced:['ok','已同步'], offline:['off','离线模式'] };
+  var m = map[state.status] || map.offline;
+  $('status-dot').className = 'dot ' + m[0];
+  $('status-text').textContent = m[1];
+}
+function renderPending(){
+  var box = $('pending-list'), tasks = buildTodayTasks();
+  $('pending-count').textContent = state.pendingUnlocked ? (tasks.length ? '共 ' + tasks.length + ' 项' : '') : '';
+  box.innerHTML = '';
+  if(!state.pendingUnlocked){
+    var d = document.createElement('div');
+    d.className = 'empty lock-placeholder';
+    d.innerHTML = '<div class="lock-icon">' + icon('lock') + '</div>' +
+      '<div style="font-weight:600;margin:10px 0 4px">待处理内容已加密</div>' +
+      '<div style="font-size:13px;color:var(--text-3);margin-bottom:14px">与工资管理共用同一密码，输入后即可查看待办事项</div>';
+    var b = document.createElement('button');
+    b.className = 'btn btn-primary'; b.type = 'button';
+    b.innerHTML = icon('lock','ic-sm') + ' 输入密码查看';
+    b.onclick = openPendingLockModal;
+    d.appendChild(b);
+    box.appendChild(d);
+    return;
+  }
+  if(!tasks.length){
+    var e2 = document.createElement('div');
+    e2.className = 'empty'; e2.textContent = '当前没有待处理事项，数据都是最新的。';
+    box.appendChild(e2); return;
+  }
+  tasks.forEach(function(t){
+    var el = document.createElement('div');
+    el.className = 'titem' + (t.level === 'overdue' ? ' overdue' : '');
+    el.setAttribute('data-sp-bindable','database');
+    el.setAttribute('data-sp-database-id', t.db ? (t.db === 'salary' ? DB_SALARY : DB_LEDGER) : DB_SALARY);
+    var s = document.createElement('span'); s.className = 'txt'; s.textContent = t.text;
+    var b = document.createElement('button');
+    b.className = 'btn btn-sm' + (t.level === 'overdue' ? ' btn-danger' : '');
+    b.type = 'button'; b.textContent = t.btn;
+    b.setAttribute('data-act', t.act);
+    if(t.id) b.setAttribute('data-id', t.id);
+    el.appendChild(s); el.appendChild(b);
+    box.appendChild(el);
+  });
+}
+function openPendingLockModal(){
+  if(!state.salaryPwd){
+    openSalarySetPwd();
+    var orig = state.modalSubmit;
+    state.modalSubmit = function(){
+      var a1 = $('lock-pwd').value, a2 = $('lock-pwd2') ? $('lock-pwd2').value : a1;
+      if(!a1){ toast('请输入密码'); return; }
+      if(a1 !== a2){ toast('两次输入不一致'); return; }
+      state.salaryPwd = a1; state.salaryUnlocked = true; state.pendingUnlocked = true;
+      try{ localStorage.setItem('wb_dataws_salpwd', a1); }catch(e){}
+      closeModal(); refreshAll(); toast('密码已设置，待处理与工资均已解锁');
+    };
+    return;
+  }
+  $('modal-title').textContent = '查看待处理事项';
+  $('modal-save').textContent = '解锁';
+  $('modal-body').innerHTML =
+    '<div class="form" style="grid-template-columns:1fr">' +
+      '<label class="fld">密码<input type="password" id="lock-pwd" placeholder="请输入查看密码（与工资管理相同）" autocomplete="off"></label>' +
+      '<div class="note" style="margin-top:-4px">该密码与工资管理共用。忘记密码可在工资管理中「重设密码」。</div>' +
+    '</div>';
+  state.modalSubmit = function(){
+    var v = $('lock-pwd').value;
+    if(v === state.salaryPwd){ state.pendingUnlocked = true; closeModal(); refreshAll(); toast('已解锁待处理事项'); }
+    else { toast('密码错误，请重试'); }
+  };
+  $('modal').hidden = false;
+}
+function renderTabBadge(){
+  var tab = $('tab-pending');
+  if(!state.pendingUnlocked){ tab.innerHTML = '待处理'; return; }
+  var n = buildTodayTasks().length;
+  tab.innerHTML = '待处理' + (n ? '<span class="badge">' + n + '</span>' : '');
+}
+function renderSalaryControls(){
+  var sel = $('sal-year'), years = salaryYears();
+  var html = '<option value="">全部年份</option>';
+  years.forEach(function(y){ html += '<option value="' + esc(y) + '"' + (state.salYear === y ? ' selected' : '') + '>' + esc(y) + ' 年</option>'; });
+  sel.innerHTML = html;
+  var btns = $('sal-scope').getElementsByTagName('button');
+  for(var i = 0; i < btns.length; i++){
+    btns[i].className = btns[i].getAttribute('data-scope') === state.salScope ? 'on' : '';
+  }
+}
+function renderSalaryKPI(){
+  var a = salaryAgg(state.salary);
+  if(state.salaryUnlocked){
+    setDBText($('sal-kpi-due'), DB_SALARY, fmtMoney(a.due));
+    setDBText($('sal-kpi-paid'), DB_SALARY, fmtMoney(a.paid));
+    setDBText($('sal-kpi-unpaid'), DB_SALARY, fmtMoney(a.unpaid));
+    var rate = a.due > 0 ? Math.round(a.paid / a.due * 100) : 0;
+    setDBText($('sal-kpi-rate'), DB_SALARY, rate + '%');
+  }else{
+    setDBText($('sal-kpi-due'), DB_SALARY, '¥••••');
+    setDBText($('sal-kpi-paid'), DB_SALARY, '¥••••');
+    setDBText($('sal-kpi-unpaid'), DB_SALARY, '¥••••');
+    setDBText($('sal-kpi-rate'), DB_SALARY, '••%');
+  }
+}
+function renderSalaryTable(){
+  var thead = $('sal-thead'), tbody = $('sal-tbody');
+  tbody.innerHTML = '';
+  if(state.salScope === 'month'){
+    thead.innerHTML = '<tr><th class="ck"><input type="checkbox" id="sal-selall" class="ck" data-selall="salary"></th><th>月份</th><th class="num">应发工资</th><th class="num">已发金额</th><th class="num">未发金额</th><th>状态</th><th>备注</th><th></th></tr>';
+    var rows = filteredSalary().slice().reverse();
+    $('sal-table-title').textContent = '月度明细';
+    $('sal-table-hint').textContent = '共 ' + rows.length + ' 个月';
+    if(!rows.length){ tbody.innerHTML = '<tr><td colspan="8" class="empty">该条件下暂无记录</td></tr>'; return; }
+    rows.forEach(function(r){
+      var due = num(r['应发工资']), paid = num(r['已发金额']), unpaid = num(r['未发金额']);
+      var st = r['发放状态'] || deriveStatus(due, paid);
+      var cls = st === '已结清' ? 'ok' : (st === '未发放' ? 'bad' : 'mid');
+      tbody.appendChild(salaryRow(r, [
+        {t:r['月份']||'-', l:'月份'},
+        {t:salMoney(due), l:'应发工资', n:1},
+        {t:salMoney(paid), l:'已发金额', n:1},
+        {t:salMoney(unpaid), l:'未发金额', n:1, cls:unpaid > 0.005 ? 'amt neg' : 'amt pos'},
+        {h:'<span class="pill ' + cls + '">' + esc(st) + '</span>', l:'状态'},
+        {t:(r['备注']||'') || '-', l:'备注'}
+      ]));
+    });
+    syncSelAll('salary');
+  }else{
+    thead.innerHTML = '<tr><th>年份</th><th class="num">应发合计</th><th class="num">已发合计</th><th class="num">未发合计</th><th class="num">月份数</th><th class="num">发放率</th></tr>';
+    var yrs = yearAggRows();
+    if(state.salYear) yrs = yrs.filter(function(y){ return y.year === state.salYear; });
+    $('sal-table-title').textContent = '年度汇总';
+    $('sal-table-hint').textContent = '共 ' + yrs.length + ' 年';
+    if(!yrs.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">该条件下暂无记录</td></tr>'; return; }
+    yrs.forEach(function(y){
+      var tr = document.createElement('tr');
+      var rate = y.due > 0 ? Math.round(y.paid / y.due * 100) + '%' : '-';
+      var cells = [
+        {t:y.year + ' 年', l:'年份'},
+        {t:salMoney(y.due), l:'应发合计', n:1},
+        {t:salMoney(y.paid), l:'已发合计', n:1},
+        {t:salMoney(y.unpaid), l:'未发合计', n:1, cls:'amt ' + (y.unpaid > 0.005 ? 'neg' : 'pos')},
+        {t:String(y.months), l:'月份数', n:1},
+        {t:salPct(y.due > 0 ? Math.round(y.paid / y.due * 100) : 0), l:'发放率', n:1}
+      ];
+      cells.forEach(function(c){
+        var td = document.createElement('td');
+        if(c.n) td.className = 'num';
+        td.setAttribute('data-label', c.l);
+        td.setAttribute('data-sp-bindable','database');
+        td.setAttribute('data-sp-database-id', DB_SALARY);
+        td.textContent = c.t;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+}
+function salaryRow(r, cells){
+  var tr = document.createElement('tr');
+  var ck = document.createElement('td');
+  ck.className = 'ck'; ck.setAttribute('data-label','');
+  var inp = document.createElement('input');
+  inp.type = 'checkbox'; inp.className = 'ck';
+  inp.setAttribute('data-sel', 'salary'); inp.setAttribute('data-id', r._id);
+  if(state.selSal[r._id]) inp.checked = true;
+  ck.appendChild(inp); tr.appendChild(ck);
+  cells.forEach(function(c){
+    var td = document.createElement('td');
+    if(c.n) td.className = 'num';
+    if(c.cls) td.className = c.cls + (c.n ? ' num' : '');
+    td.setAttribute('data-label', c.l);
+    td.setAttribute('data-sp-bindable','database');
+    td.setAttribute('data-sp-database-id', DB_SALARY);
+    if(c.h) td.innerHTML = c.h; else td.textContent = c.t;
+    tr.appendChild(td);
+  });
+  var ops = document.createElement('td');
+  ops.className = 'ops';
+  ops.setAttribute('data-label','');
+  var be = document.createElement('button');
+  be.className = 'btn btn-sm'; be.type = 'button'; be.innerHTML = icon('pencil','ic-sm') + '编辑';
+  be.setAttribute('data-editsal', r._id);
+  var bd = document.createElement('button');
+  bd.className = 'btn btn-sm btn-danger'; bd.type = 'button'; bd.innerHTML = icon('trash','ic-sm') + '删除';
+  bd.setAttribute('data-delsal', r._id);
+  ops.appendChild(be); ops.appendChild(bd);
+  tr.appendChild(ops);
+  return tr;
+}
+function renderSalaryCharts(){
+  if(!state.salaryUnlocked){
+    var lock = '<div class="lock-chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3 M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z M12 15v2"/></svg><span>数据已隐藏，输入密码后查看图表</span></div>';
+    $('sal-trend').innerHTML = lock;
+    $('sal-pie').innerHTML = lock;
+    return;
+  }
+  var rows = (state.salScope === 'total' ? state.salary : filteredSalary());
+  var sorted = rows.slice().sort(function(a,b){ return String(a['月份']||'').localeCompare(String(b['月份']||'')); });
+  var labels = sorted.map(function(r){ return r['月份'] || ''; });
+  var due = sorted.map(function(r){ return num(r['应发工资']); });
+  var paid = sorted.map(function(r){ return num(r['已发金额']); });
+  $('sal-trend').innerHTML = lineChart([
+    { data:due, color:cssVar('--brand') },
+    { data:paid, color:cssVar('--income') }
+  ], labels);
+  $('sal-trend-sub').textContent = labels.length ? ('共 ' + labels.length + ' 个月 · ' + esc(labels[0]) + ' 至 ' + esc(labels[labels.length-1])) : '应发与已发对比';
+  var a = salaryAgg(sorted);
+  $('sal-pie').innerHTML = donutChart([
+    { label:'已发', value:a.paid, color:cssVar('--income') },
+    { label:'未发', value:a.unpaid, color:cssVar('--expense') }
+  ], fmtMoney(a.unpaid), '未发金额');
+}
+function renderLedgerControls(){
+  var ys = ledgerYears(), ms = ledgerMonthsOfYear();
+  var hy = '<option value="">全部</option>';
+  ys.forEach(function(y){ hy += '<option value="' + esc(y) + '"' + (state.ledYear === y ? ' selected' : '') + '>' + esc(y) + ' 年</option>'; });
+  $('led-year').innerHTML = hy;
+  var hm = '<option value="">全部</option>';
+  ms.forEach(function(m){ hm += '<option value="' + esc(m) + '"' + (state.ledMonth === m ? ' selected' : '') + '>' + esc(m) + '</option>'; });
+  $('led-month').innerHTML = hm;
+  var chs = state.ledgerOpts['渠道'] || [];
+  var hc = '<option value="">全部</option>';
+  chs.forEach(function(o){ hc += '<option value="' + esc(o.text) + '"' + (state.ledChannel === o.text ? ' selected' : '') + '>' + esc(o.text) + '</option>'; });
+  $('led-channel').innerHTML = hc;
+}
+function renderLedgerKPI(){
+  var a = ledgerAgg(state.ledger);
+  setDBText($('led-kpi-in'), DB_LEDGER, fmtMoney(a.income));
+  setDBText($('led-kpi-out'), DB_LEDGER, fmtMoney(a.expense));
+  var el = $('led-kpi-net');
+  setDBText(el, DB_LEDGER, fmtMoney(a.net));
+  el.className = 'v ' + (a.net >= 0 ? 'pos' : 'neg');
+  var totalCh = 0;
+  Object.keys(a.byChannel).forEach(function(k){ totalCh += a.byChannel[k]; });
+  var wx = a.byChannel['微信'] || 0;
+  setDBText($('led-kpi-wx'), DB_LEDGER, totalCh > 0 ? Math.round(wx / totalCh * 100) + '%' : '0%');
+}
+function renderLedgerCharts(){
+  var rows = ledgerFiltered(), a = ledgerAgg(rows);
+  var series = monthSeries(a.byMonth);
+  $('led-trend').innerHTML = barChart(series);
+  $('led-trend-sub').textContent = series.length ? ('共 ' + series.length + ' 个月有流水') : '收入与支出分组对比';
+
+  var parts = Object.keys(a.byChannel).map(function(k){
+    return { label:k, value:a.byChannel[k], color:CHANNEL_COLOR[k] || '#8B93A7' };
+  }).sort(function(x,y){ return y.value - x.value; });
+  $('led-pie').innerHTML = donutChart(parts, fmtMoney(a.income), '收入合计');
+  var lg = $('led-pie-legend'); lg.innerHTML = '';
+  parts.forEach(function(p){
+    var s = document.createElement('span');
+    s.innerHTML = '<i style="background:' + p.color + '"></i>';
+    s.appendChild(document.createTextNode(p.label + ' ' + fmtMoney(p.value)));
+    s.setAttribute('data-sp-bindable','database');
+    s.setAttribute('data-sp-database-id', DB_LEDGER);
+    lg.appendChild(s);
+  });
+
+  var cats = Object.keys(a.byCategory).map(function(k){ return { name:k, value:a.byCategory[k] }; })
+    .sort(function(x,y){ return y.value - x.value; });
+  var box = $('led-catbar'); box.innerHTML = '';
+  if(!cats.length){ box.innerHTML = '<div class="empty">暂无支出记录</div>'; return; }
+  var top = cats.slice(0, 6), max = top[0].value || 1;
+  top.forEach(function(c){
+    var row = document.createElement('div'); row.className = 'row';
+    row.setAttribute('data-sp-bindable','database');
+    row.setAttribute('data-sp-database-id', DB_LEDGER);
+    var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = c.name;
+    var tr = document.createElement('div'); tr.className = 'tr';
+    var fl = document.createElement('div'); fl.className = 'fl';
+    fl.style.width = Math.max(3, c.value / max * 100) + '%';
+    tr.appendChild(fl);
+    var vl = document.createElement('div'); vl.className = 'vl'; vl.textContent = fmtMoney(c.value);
+    row.appendChild(nm); row.appendChild(tr); row.appendChild(vl);
+    box.appendChild(row);
+  });
+}
+function renderLedgerTableControls(){
+  if(!$('led-table-year')) return;
+  var ys = ledgerTableYears();
+  var hy = '<option value="">全部</option>';
+  ys.forEach(function(y){ hy += '<option value="' + esc(y) + '"' + (state.ledTableYear === y ? ' selected' : '') + '>' + esc(y) + ' 年</option>'; });
+  $('led-table-year').innerHTML = hy;
+
+  var ms = ledgerTableMonthsOfYear();
+  var hm = '<option value="">全部</option>';
+  ms.forEach(function(m){ hm += '<option value="' + esc(m) + '"' + (state.ledTableMonth === m ? ' selected' : '') + '>' + esc(m) + '</option>'; });
+  $('led-table-month').innerHTML = hm;
+
+  var chs = state.ledgerOpts['渠道'] || [];
+  var hc = '<option value="">全部</option>';
+  chs.forEach(function(o){ hc += '<option value="' + esc(o.text) + '"' + (state.ledTableChannel === o.text ? ' selected' : '') + '>' + esc(o.text) + '</option>'; });
+  $('led-table-channel').innerHTML = hc;
+
+  var allCats = {};
+  state.ledger.forEach(function(r){
+    var ct = r['分类'];
+    if(state.ledTableType && r['收支类型'] !== state.ledTableType) return;
+    if(ct) allCats[ct] = true;
+  });
+  var hk = '<option value="">全部</option>';
+  Object.keys(allCats).sort().forEach(function(k){
+    hk += '<option value="' + esc(k) + '"' + (state.ledTableCategory === k ? ' selected' : '') + '>' + esc(k) + '</option>';
+  });
+  $('led-table-category').innerHTML = hk;
+}
+function ledgerTableYears(){
+  var m = {};
+  state.ledger.forEach(function(r){ var y = dateOnly(r['交易时间']).slice(0,4); if(y) m[y] = 1; });
+  return Object.keys(m).sort().reverse();
+}
+function renderLedgerTable(){
+  var tbody = $('led-tbody'), rows = ledgerTableFiltered();
+  tbody.innerHTML = '';
+  $('led-count').textContent = '共 ' + rows.length + ' 笔';
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="9" class="empty">该条件下暂无流水，可手工录入或批量导入</td></tr>'; return; }
+  rows.forEach(function(r){
+    var isIn = r['收支类型'] === '收入', amt = num(r['金额']);
+    var tr = document.createElement('tr');
+    var ck = document.createElement('td');
+    ck.className = 'ck'; ck.setAttribute('data-label','');
+    var inp = document.createElement('input');
+    inp.type = 'checkbox'; inp.className = 'ck';
+    inp.setAttribute('data-sel', 'ledger'); inp.setAttribute('data-id', r._id);
+    if(state.selLed[r._id]) inp.checked = true;
+    ck.appendChild(inp); tr.appendChild(ck);
+    var cells = [
+      { t: dateOnly(r['交易时间']) || '-', l:'日期' },
+      { t: (r['摘要']||'-'), l:'摘要' },
+      { h: '<span class="pill ' + (isIn ? 'ok' : 'bad') + '">' + esc(r['收支类型']||'-') + '</span>', l:'类型' },
+      { h: '<span class="pill neu">' + esc(r['渠道']||'-') + '</span>', l:'渠道' },
+      { t: (r['分类']||'-'), l:'分类' },
+      { t: (isIn ? '+' : '-') + fmtMoney(amt), l:'金额', cls:'amt ' + (isIn ? 'pos' : 'neg') + ' num' },
+      { h: '<span class="pill ' + (r['数据来源'] === '截图识别' ? 'mid' : 'neu') + '">' + esc(r['数据来源']||'-') + '</span>', l:'来源' }
+    ];
+    cells.forEach(function(c){
+      var td = document.createElement('td');
+      if(c.cls) td.className = c.cls;
+      td.setAttribute('data-label', c.l);
+      td.setAttribute('data-sp-bindable','database');
+      td.setAttribute('data-sp-database-id', DB_LEDGER);
+      if(c.h) td.innerHTML = c.h; else td.textContent = c.t;
+      tr.appendChild(td);
+    });
+    var ops = document.createElement('td');
+    ops.className = 'ops'; ops.setAttribute('data-label','');
+    var be = document.createElement('button');
+    be.className = 'btn btn-sm'; be.type = 'button'; be.innerHTML = icon('pencil','ic-sm') + '编辑';
+    be.setAttribute('data-editled', r._id);
+    var bd = document.createElement('button');
+    bd.className = 'btn btn-sm btn-danger'; bd.type = 'button'; bd.innerHTML = icon('trash','ic-sm') + '删除';
+    bd.setAttribute('data-delled', r._id);
+    ops.appendChild(be); ops.appendChild(bd);
+    tr.appendChild(ops);
+    tbody.appendChild(tr);
+  });
+  syncSelAll('ledger');
+}
+function renderFormOptions(){
+  fillSelect($('led-f-type'), state.ledgerOpts['收支类型'] || []);
+  fillSelect($('led-f-channel'), state.ledgerOpts['渠道'] || []);
+  renderCatOptions($('led-f-cat'), $('led-f-type').value);
+}
+function fillSelect(sel, opts){
+  var cur = sel.value;
+  var h = '<option value="">请选择</option>';
+  opts.forEach(function(o){ h += '<option value="' + esc(o.text) + '">' + esc(o.text) + '</option>'; });
+  sel.innerHTML = h;
+  if(cur) sel.value = cur;
+}
+function renderCatOptions(sel, type){
+  var all = state.ledgerOpts['分类'] || [], cur = sel.value;
+  var vis = all.filter(function(o){ return !type || !CAT_TYPE[o.text] || CAT_TYPE[o.text] === type; });
+  var h = '<option value="">请选择</option>';
+  vis.forEach(function(o){ h += '<option value="' + esc(o.text) + '">' + esc(o.text) + '</option>'; });
+  sel.innerHTML = h;
+  if(cur) sel.value = cur;
+}
+
+/* ============ KPI 语义图标 ============ */
+function decorateKpis(){
+  var map = {
+    'sal-kpi-due':'<path d="M12 2v20M7 6h7a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h9"/>',
+    'sal-kpi-paid':'<path d="M20 6 9 17l-5-5"/>',
+    'sal-kpi-unpaid':'<path d="M12 8v5M12 16.6v.4M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+    'sal-kpi-rate':'<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 12l5-3"/>',
+    'led-kpi-in':'<path d="M12 19V5M5 12l7-7 7 7"/>',
+    'led-kpi-out':'<path d="M12 5v14M5 12l7 7 7-7"/>',
+    'led-kpi-net':'<path d="M4 14h16M4 14l-2 6h6zM20 14l-2 6h6z"/>',
+    'led-kpi-wx':'<path d="M21 12a8 8 0 1 1-8-8"/><path d="M12 4v8h8"/>'
+  };
+  Object.keys(map).forEach(function(id){
+    var el = $(id); if(!el) return;
+    var kpi = el.parentNode;
+    if(kpi.getAttribute('data-deco')) return;
+    kpi.setAttribute('data-deco','1');
+    if(id === 'led-kpi-net') kpi.classList.add('net');
+    var chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + map[id] + '</svg>';
+    kpi.insertBefore(chip, kpi.firstChild);
+  });
+}
+
+function renderSalaryLock(){
+  var b = $('sal-lock-banner');
+  if(!b) return;
+  b.hidden = false;
+  if(state.salaryUnlocked){
+    $('sal-lock-title').textContent = '工资金额已解锁';
+    $('sal-lock-sub').textContent = '当前可查看全部真实数据，点击右侧可重新隐藏';
+    $('sal-lock-btn').textContent = '隐藏金额';
+    $('sal-pwd-btn').hidden = false;
+  }else{
+    $('sal-lock-title').textContent = '工资金额已隐藏';
+    $('sal-lock-sub').textContent = '输入密码后可查看真实金额（防误触，非加密存储）';
+    $('sal-lock-btn').textContent = '查看真实数据';
+    $('sal-pwd-btn').hidden = true;
+  }
+}
+
+/* ============ 右侧悬浮汇总（筛选命中时展示四张卡片，否则隐藏） ============ */
+function salaryFilterActive(){
+  if(state.salScope === 'year') return !!state.salYear;
+  return false;
+}
+function ledgerFilterActive(){
+  return !!(state.ledYear || state.ledMonth || state.ledType || state.ledChannel);
+}
+function ledgerTableFilterActive(){
+  return !!(state.ledTableYear || state.ledTableMonth || state.ledTableType || state.ledTableChannel || state.ledTableCategory);
+}
+function renderSalaryFloat(){
+  var box = $('sal-float');
+  if(!box) return;
+  var row = box.parentNode;
+  if(!salaryFilterActive()){
+    box.classList.add('hidden');
+    if(row) row.classList.remove('with-float');
+    return;
+  }
+  box.classList.remove('hidden');
+  if(row) row.classList.add('with-float');
+  var rows = filteredSalary();
+  var a = salaryAgg(rows);
+  var locked = !state.salaryUnlocked;
+  $('sal-float-due').textContent = locked ? '¥••••' : fmtMoney(a.due);
+  $('sal-float-paid').textContent = locked ? '¥••••' : fmtMoney(a.paid);
+  $('sal-float-unpaid').textContent = locked ? '¥••••' : fmtMoney(a.unpaid);
+  var rate = a.due > 0 ? Math.round(a.paid / a.due * 100) : 0;
+  $('sal-float-rate').textContent = locked ? '••%' : rate + '%';
+  var scopeText = (state.salScope === 'year') ? (state.salYear + ' 年') : '筛选后';
+  $('sal-float-due-hint').textContent = scopeText + ' · 共 ' + a.months + ' 个月';
+  $('sal-float-paid-hint').textContent = '已发/应发';
+  $('sal-float-unpaid-hint').textContent = '剩余未发';
+}
+function renderLedgerFloat(){
+  var box = $('led-float');
+  if(!box) return;
+  var row = box.parentNode;
+  if(!ledgerFilterActive()){
+    box.classList.add('hidden');
+    if(row) row.classList.remove('with-float');
+    return;
+  }
+  box.classList.remove('hidden');
+  if(row) row.classList.add('with-float');
+  var rows = ledgerFiltered();
+  var a = ledgerAgg(rows);
+  $('led-float-in').textContent = fmtMoney(a.income);
+  $('led-float-out').textContent = fmtMoney(a.expense);
+  $('led-float-net').textContent = fmtMoney(a.net);
+  $('led-float-count').textContent = rows.length;
+  var parts = [];
+  if(state.ledYear) parts.push(state.ledYear + ' 年');
+  if(state.ledMonth) parts.push(state.ledMonth);
+  if(state.ledType) parts.push(state.ledType);
+  if(state.ledChannel) parts.push(state.ledChannel);
+  $('led-float-in-hint').textContent = parts.join(' · ') || '筛选后';
+  $('led-float-out-hint').textContent = parts.join(' · ') || '筛选后';
+  $('led-float-net-hint').textContent = a.net >= 0 ? '盈余' : '缺口';
+}
+function renderBatchBar(){
+  var bar = $('batch-bar'), acts = $('batch-acts'), cnt = $('batch-count');
+  if(!bar) return;
+  var kind = state.tab === 'ledger' ? 'ledger' : 'salary';
+  var ids = selectedIds(kind);
+  if(!ids.length){ bar.hidden = true; return; }
+  cnt.textContent = '已选 ' + ids.length + ' 条';
+  if(kind === 'salary'){
+    acts.innerHTML =
+      '<button class="btn btn-sm" data-bact="selall-sal" type="button">全选本页</button>' +
+      '<button class="btn btn-sm btn-settle" data-bact="settle-sal" type="button">标记已结清</button>' +
+      '<button class="btn btn-sm btn-unsettle" data-bact="unsettle-sal" type="button">标记未发放</button>' +
+      '<button class="btn btn-sm btn-danger" data-bact="del-sal" type="button">批量删除</button>';
+  }else{
+    acts.innerHTML =
+      '<button class="btn btn-sm" data-bact="selall-led" type="button">全选本页</button>' +
+      '<button class="btn btn-sm btn-danger" data-bact="del-led" type="button">批量删除</button>';
+  }
+  bar.hidden = false;
+}
+
+/* ============ 统一刷新入口 ============ */
+function refreshAll(){
+  decorateKpis();
+  renderStatus();
+  renderUser();
+  renderPending();
+  renderTabBadge();
+  renderApproval();
+  renderSalaryControls();
+  renderSalaryLock();
+  renderSalaryKPI();
+  renderSalaryFloat();
+  renderSalaryTable();
+  renderSalaryCharts();
+  renderLedgerControls();
+  renderLedgerTableControls();
+  renderLedgerKPI();
+  renderLedgerFloat();
+  renderLedgerCharts();
+  renderLedgerTable();
+  renderBatchBar();
+  syncSelAll('salary');
+  syncSelAll('ledger');
+}
+
+/* ============ 弹窗 ============ */
+function openModal(title, html, onSubmit){
+  $('modal-title').textContent = title;
+  $('modal-body').innerHTML = html;
+  state.modalSubmit = onSubmit;
+  $('modal').hidden = false;
+}
+function closeModal(){
+  $('modal').hidden = true; state.modalSubmit = null;
+  var sv = $('modal-save'); if(sv) sv.textContent = '保存';
+}
+function openSalaryLockModal(){
+  if(state.salaryPwd){
+    $('modal-title').textContent = '查看工资金额';
+    $('modal-save').textContent = '解锁';
+    $('modal-body').innerHTML =
+      '<div class="form" style="grid-template-columns:1fr">' +
+        '<label class="fld">密码<input type="password" id="lock-pwd" placeholder="请输入查看密码" autocomplete="off"></label>' +
+        '<div class="note" style="margin-top:-4px">忘记了密码？点下方「重设密码」可清空后重新设置（会清除已解锁状态，不影响工资数据）。</div>' +
+        '<div style="display:flex;gap:8px"><button class="btn btn-sm btn-ghost" id="lock-reset" type="button">重设密码</button></div>' +
+      '</div>';
+    state.modalSubmit = function(){
+      var v = $('lock-pwd').value;
+      if(v === state.salaryPwd){ state.salaryUnlocked = true; closeModal(); refreshAll(); toast('已解锁工资金额'); }
+      else { toast('密码错误，请重试'); }
+    };
+    $('lock-reset').onclick = function(){
+      if(!confirm('重设密码将清除当前查看密码并锁定金额，确认继续？')) return;
+      try{ localStorage.removeItem('wb_dataws_salpwd'); }catch(e){}
+      state.salaryPwd = ''; state.salaryUnlocked = false;
+      openSalarySetPwd();
+    };
+  }else{
+    openSalarySetPwd();
+  }
+  $('modal').hidden = false;
+}
+function openSalarySetPwd(){
+  $('modal-title').textContent = '设置查看密码';
+  $('modal-save').textContent = '设置并解锁';
+  $('modal-body').innerHTML =
+    '<div class="form" style="grid-template-columns:1fr">' +
+      '<label class="fld">设置密码<input type="password" id="lock-pwd" placeholder="设置查看密码（防误触，非加密）" autocomplete="off"></label>' +
+      '<label class="fld">确认密码<input type="password" id="lock-pwd2" placeholder="再次输入" autocomplete="off"></label>' +
+      '<div class="note">提示：密码仅用于防止他人误看金额，存储于本地浏览器，并非加密保护，请勿使用重要密码。</div>' +
+    '</div>';
+  state.modalSubmit = function(){
+    var a1 = $('lock-pwd').value, a2 = $('lock-pwd2').value;
+    if(!a1){ toast('请输入密码'); return; }
+    if(a1 !== a2){ toast('两次输入不一致'); return; }
+    state.salaryPwd = a1;
+    try{ localStorage.setItem('wb_dataws_salpwd', a1); }catch(e){}
+    state.salaryUnlocked = true; closeModal(); refreshAll(); toast('密码已设置并解锁');
+  };
+  $('modal').hidden = false;
+}
+function openSalaryChangePwd(){
+  if(!state.salaryPwd){ openSalarySetPwd(); return; }
+  $('modal-title').textContent = '修改查看密码';
+  $('modal-save').textContent = '确认修改';
+  $('modal-body').innerHTML =
+    '<div class="form" style="grid-template-columns:1fr">' +
+      '<label class="fld">原密码<input type="password" id="lock-old" placeholder="请输入当前密码" autocomplete="off"></label>' +
+      '<label class="fld">新密码<input type="password" id="lock-pwd" placeholder="设置新密码" autocomplete="off"></label>' +
+      '<label class="fld">确认新密码<input type="password" id="lock-pwd2" placeholder="再次输入" autocomplete="off"></label>' +
+    '</div>';
+  state.modalSubmit = function(){
+    if($('lock-old').value !== state.salaryPwd){ toast('原密码错误'); return; }
+    var a1 = $('lock-pwd').value, a2 = $('lock-pwd2').value;
+    if(!a1){ toast('请输入新密码'); return; }
+    if(a1 !== a2){ toast('两次输入不一致'); return; }
+    state.salaryPwd = a1;
+    try{ localStorage.setItem('wb_dataws_salpwd', a1); }catch(e){}
+    closeModal(); toast('密码已更新');
+  };
+  $('modal').hidden = false;
+}
+function batchDelete(kind){
+  var rows = selRows(kind);
+  if(!rows.length) return;
+  if(!confirm('确认删除选中的 ' + rows.length + ' 条记录？此操作不可撤销。')) return;
+  clearSel(kind);
+  deleteRows(kind, rows);
+}
+function batchSettle(settled){
+  var rows = selRows('salary');
+  if(!rows.length) return;
+  if(!confirm('确认将选中的 ' + rows.length + ' 个月份标记为「' + (settled ? '已结清' : '未发放') + '」？')) return;
+  var jobs = rows.map(function(r){
+    var paid = settled ? num(r['应发工资']) : 0;
+    var unpaid = settled ? 0 : num(r['应发工资']);
+    return updateSalaryRecord(r._id, {
+      '已发金额': { number: paid },
+      '未发金额': { number: unpaid },
+      '发放状态': { select: settled ? '已结清' : '未发放' }
+    });
+  });
+  clearSel('salary');
+  Promise.all(jobs)
+    .then(reloadAll).then(refreshAll)
+    .then(function(){ toast(settled ? '已标记为结清' : '已标记为未发放'); })
+    .catch(function(){ toast('部分更新失败，请重试'); });
+}
+function modalVal(id){
+  var el = $(id);
+  return el ? el.value : '';
+}
+function openSalaryModal(rec){
+  var r = rec || {};
+  var html =
+    '<label class="fld">月份<input type="text" id="m-sal-month" value="' + esc(r['月份']||'') + '" placeholder="2026-08" maxlength="7"></label>' +
+    '<label class="fld">应发工资<input type="number" id="m-sal-due" value="' + esc(r['应发工资']==null?'':r['应发工资']) + '" step="0.01" inputmode="decimal"></label>' +
+    '<label class="fld">已发金额<input type="number" id="m-sal-paid" value="' + esc(r['已发金额']==null?'':r['已发金额']) + '" step="0.01" inputmode="decimal"></label>' +
+    '<label class="fld">未发金额<input type="number" id="m-sal-unpaid" value="' + esc(r['未发金额']==null?'':r['未发金额']) + '" step="0.01" inputmode="decimal"></label>' +
+    '<label class="fld">发放状态<select id="m-sal-st"></select></label>' +
+    '<label class="fld full">备注<input type="text" id="m-sal-note" value="' + esc(r['备注']||'') + '"></label>';
+  openModal(rec ? '编辑工资记录' : '新增工资记录', html, function(){
+    var month = modalVal('m-sal-month').trim();
+    if(!/^\d{4}-\d{2}$/.test(month)){ toast('月份格式应为 YYYY-MM'); return; }
+    var due = num(modalVal('m-sal-due')), paid = num(modalVal('m-sal-paid'));
+    var unpaidRaw = modalVal('m-sal-unpaid');
+    var unpaid = unpaidRaw === '' ? (due - paid) : num(unpaidRaw);
+    var props = {
+      '月份': { text: month },
+      '应发工资': { number: due },
+      '已发金额': { number: paid },
+      '未发金额': { number: unpaid },
+      '发放状态': { select: modalVal('m-sal-st') || deriveStatus(due, paid) },
+      '备注': { text: modalVal('m-sal-note').trim() }
+    };
+    return rec ? updateSalaryRecord(rec._id, props) : addSalaryRecord(props);
+  });
+  fillSelectSel($('m-sal-st'), state.salaryOpts['发放状态'] || [], r['发放状态'] || deriveStatus(num(r['应发工资']), num(r['已发金额'])));
+}
+function fillSelectSel(sel, opts, cur){
+  var h = '<option value="">自动</option>';
+  opts.forEach(function(o){ h += '<option value="' + esc(o.text) + '">' + esc(o.text) + '</option>'; });
+  sel.innerHTML = h;
+  if(cur) sel.value = cur;
+}
+function openLedgerModal(rec){
+  var r = rec || {};
+  var html =
+    '<label class="fld">交易时间<input type="date" id="m-led-date" value="' + esc(dateOnly(r['交易时间'])) + '"></label>' +
+    '<label class="fld">收支类型<select id="m-led-type"></select></label>' +
+    '<label class="fld">渠道<select id="m-led-channel"></select></label>' +
+    '<label class="fld">分类<select id="m-led-cat"></select></label>' +
+    '<label class="fld">金额（正数）<input type="number" id="m-led-amt" value="' + esc(r['金额']==null?'':r['金额']) + '" step="0.01" inputmode="decimal"></label>' +
+    '<label class="fld">数据来源<select id="m-led-src"></select></label>' +
+    '<label class="fld full">摘要<input type="text" id="m-led-title" value="' + esc(r['摘要']||'') + '"></label>' +
+    '<label class="fld full">备注<input type="text" id="m-led-note" value="' + esc(r['备注']||'') + '"></label>';
+  openModal(rec ? '编辑流水' : '新增流水', html, function(){
+    var date = modalVal('m-led-date'), amt = num(modalVal('m-led-amt'));
+    if(!date){ toast('请选择交易时间'); return; }
+    if(!(amt > 0)){ toast('金额需为大于 0 的数字'); return; }
+    var props = {
+      '交易时间': { date: date },
+      '收支类型': { select: modalVal('m-led-type') || '收入' },
+      '渠道': { select: modalVal('m-led-channel') || '微信' },
+      '分类': { select: modalVal('m-led-cat') },
+      '金额': { number: amt },
+      '数据来源': { select: modalVal('m-led-src') || '手动录入' },
+      '摘要': { text: modalVal('m-led-title').trim() || '未命名' },
+      '备注': { text: modalVal('m-led-note').trim() }
+    };
+    return rec ? updateLedgerRecord(rec._id, props) : addLedgerRecord(props);
+  });
+  fillSelect($('m-led-type'), state.ledgerOpts['收支类型'] || []);
+  fillSelect($('m-led-channel'), state.ledgerOpts['渠道'] || []);
+  fillSelect($('m-led-src'), state.ledgerOpts['数据来源'] || []);
+  $('m-led-type').value = r['收支类型'] || '收入';
+  $('m-led-channel').value = r['渠道'] || '微信';
+  $('m-led-src').value = r['数据来源'] || '手动录入';
+  renderCatOptions($('m-led-cat'), $('m-led-type').value);
+  $('m-led-cat').value = r['分类'] || '';
+  $('m-led-type').onchange = function(){ renderCatOptions($('m-led-cat'), this.value); };
+}
+
+/* ============ CSV / 文本导入 ============ */
+function parseCSV(text){
+  var rows = [], row = [], cur = '', inQ = false;
+  text = text.replace(/^\uFEFF/, '');
+  for(var i = 0; i < text.length; i++){
+    var c = text.charAt(i);
+    if(inQ){
+      if(c === '"'){ if(text.charAt(i+1) === '"'){ cur += '"'; i++; } else inQ = false; }
+      else cur += c;
+    }else{
+      if(c === '"') inQ = true;
+      else if(c === ','){ row.push(cur); cur = ''; }
+      else if(c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if(c !== '\r') cur += c;
+    }
+  }
+  if(cur !== '' || row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(function(r){ return r.some(function(c){ return String(c).trim() !== ''; }); });
+}
+var CSV_FIELDS = ['交易时间','渠道','收支类型','分类','金额','摘要','备注'];
+var CSV_HINTS = [
+  ['交易时间', ['日期','时间','交易时间','date','记账日期']],
+  ['渠道', ['渠道','支付方式','方式','账户','channel']],
+  ['收支类型', ['收支','类型','收支类型','方向','type']],
+  ['分类', ['分类','类别','科目','category']],
+  ['金额', ['金额','amount','数额','发生额','money','price']],
+  ['摘要', ['摘要','说明','描述','商品','项目','交易对方','remark','desc','内容','名称']],
+  ['备注', ['备注','note','注释','memo']]
+];
+function guessField(header){
+  var h = String(header || '').toLowerCase().replace(/\s/g, '');
+  if(!h) return '';
+  for(var i = 0; i < CSV_HINTS.length; i++){
+    var keys = CSV_HINTS[i][1];
+    for(var j = 0; j < keys.length; j++){
+      if(h.indexOf(keys[j]) !== -1) return CSV_HINTS[i][0];
+    }
+  }
+  return '';
+}
+function renderCsvMapping(){
+  var c = state.csv;
+  if(!c || !c.rows.length){ $('csv-stage').innerHTML = ''; return; }
+  var head = c.rows[0], used = {};
+  var h = '<div style="margin-top:14px; font-weight:600; font-size:14px">列映射（共 ' + Math.max(0, c.rows.length - 1) + ' 行数据）</div>';
+  head.forEach(function(col, i){
+    var guess = guessField(col);
+    if(guess && !used[guess]) used[guess] = 1; else if(guess) guess = '';
+    var opts = '<option value="">— 忽略 —</option>';
+    CSV_FIELDS.forEach(function(f){
+      opts += '<option value="' + f + '"' + (guess === f ? ' selected' : '') + '>' + f + '</option>';
+    });
+    h += '<div class="map-row"><span class="cn" title="' + esc(col) + '">' + esc(col || ('第' + (i+1) + '列')) + '</span><select data-col="' + i + '">' + opts + '</select></div>';
+  });
+  var prev = c.rows.slice(1, 4).map(function(r){
+    return '<tr>' + r.slice(0,8).map(function(v){ return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>';
+  }).join('');
+  h += '<details style="margin-top:8px"><summary style="font-size:13px;color:var(--text-2);cursor:pointer">预览前 3 行</summary><div class="prev"><table>' + prev + '</table></div></details>';
+  h += '<div style="margin-top:12px; display:flex; gap:8px"><button class="btn btn-sm btn-primary" id="csv-confirm" type="button">确认导入</button><button class="btn btn-sm" id="csv-cancel" type="button">取消</button></div>';
+  h += '<div class="note" style="margin-top:10px">缺失的必填项会自动补全：交易时间缺省为今天，渠道缺省为「其他」，类型缺省为「支出」，摘要缺省为「表格导入」。</div>';
+  $('csv-stage').innerHTML = h;
+}
+function normalizeDateInput(s){
+  s = String(s || '').trim();
+  if(!s) return '';
+  var m = s.match(/(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+  if(m) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+  var m2 = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if(m2) return m2[1] + '-' + m2[2] + '-' + m2[3];
+  return '';
+}
+function buildLedgerPropsFromRow(map, row){
+  var out = { '交易时间':'', '渠道':'', '收支类型':'', '分类':'', '金额':'', '摘要':'', '备注':'' };
+  Object.keys(map).forEach(function(f){
+    var idx = map[f];
+    if(idx != null && row[idx] != null) out[f] = String(row[idx]).trim();
+  });
+  var amt = Math.abs(num(String(out['金额']).replace(/[¥$,\s]/g, '')));
+  var type = out['收支类型'];
+  if(type !== '收入' && type !== '支出') type = /收入|收款|到账/.test(type) ? '收入' : '支出';
+  var date = normalizeDateInput(out['交易时间']) || dateTodayStr();
+  return {
+    '交易时间': { date: date },
+    '收支类型': { select: type },
+    '渠道': { select: out['渠道'] || '其他' },
+    '分类': { select: out['分类'] || (type === '收入' ? '其他收入' : '其他支出') },
+    '金额': { number: amt },
+    '摘要': { text: out['摘要'] || '表格导入' },
+    '备注': { text: out['备注'] || ('来源CSV') },
+    '数据来源': { select: '表格导入' }
+  };
+}
+function batchAddLedger(list){
+  var i = 0, ok = 0, fail = 0;
+  function next(){
+    if(i >= list.length){
+      toast('导入完成：成功 ' + ok + ' 笔' + (fail ? '，失败 ' + fail + ' 笔' : ''));
+      return reloadAll().then(refreshAll);
+    }
+    var props = list[i++];
+    return addLedgerRecord(props)
+      .then(function(){ ok++; }, function(){ fail++; })
+      .then(next);
+  }
+  return next();
+}
+
+/* ============ 备份 ============ */
+function exportJSON(){
+  var data = { exportedAt: new Date().toISOString(), salary: state.salary, ledger: state.ledger };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '工作台备份-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast('已导出 JSON 备份');
+}
+function importJSON(file){
+  var fr = new FileReader();
+  fr.onload = function(){
+    var data;
+    try{ data = JSON.parse(fr.result); }catch(e){ toast('文件不是合法 JSON'); return; }
+    if(!data || (!data.salary && !data.ledger)){ toast('文件中未找到工资或流水数据'); return; }
+    var list = [];
+    (data.salary || []).forEach(function(r){
+      list.push({ kind: 'salary', props: {
+        '月份': { text: r['月份'] || '' },
+        '应发工资': { number: num(r['应发工资']) },
+        '已发金额': { number: num(r['已发金额']) },
+        '未发金额': { number: num(r['未发金额']) },
+        '发放状态': { select: r['发放状态'] || deriveStatus(num(r['应发工资']), num(r['已发金额'])) },
+        '备注': { text: r['备注'] || '' }
+      }});
+    });
+    (data.ledger || []).forEach(function(r){
+      list.push({ kind: 'ledger', props: {
+        '交易时间': { date: dateOnly(r['交易时间']) || dateTodayStr() },
+        '收支类型': { select: r['收支类型'] || '支出' },
+        '渠道': { select: r['渠道'] || '其他' },
+        '分类': { select: r['分类'] || '' },
+        '金额': { number: num(r['金额']) },
+        '数据来源': { select: r['数据来源'] || '手动录入' },
+        '摘要': { text: r['摘要'] || '导入' },
+        '备注': { text: r['备注'] || '' }
+      }});
+    });
+    if(!list.length){ toast('没有可导入的记录'); return; }
+    var i = 0, ok = 0, fail = 0;
+    function next(){
+      if(i >= list.length){
+        toast('恢复完成：成功 ' + ok + ' 条' + (fail ? '，失败 ' + fail + ' 条' : ''));
+        return reloadAll().then(refreshAll);
+      }
+      var it = list[i++];
+      return addRecordOf(it.kind, it.props)
+        .then(function(){ ok++; }, function(){ fail++; }).then(next);
+    }
+    next();
+  };
+  fr.readAsText(file);
+}
+function deleteRows(kind, rows){
+  if(!rows.length){ toast('没有符合条件的记录'); return Promise.resolve(); }
+  var i = 0, ok = 0;
+  function next(){
+    if(i >= rows.length){
+      toast('已删除 ' + ok + ' 条记录');
+      return reloadAll().then(refreshAll);
+    }
+    var id = rows[i++]._id;
+    return deleteRecordOf(kind, id)
+      .then(function(){ ok++; }, function(){}).then(next);
+  }
+  return next();
+}
+
+/* ============ 录入草稿本地缓存（断网或误关页面不丢输入） ============ */
+var DRAFT_KEY = 'wb_dataws_draft';
+var SAL_DRAFT_FIELDS = ['sal-f-month','sal-f-due','sal-f-paid','sal-f-note'];
+var LED_DRAFT_FIELDS = ['led-f-date','led-f-type','led-f-channel','led-f-cat','led-f-amt','led-f-title','led-f-note'];
+var DRAFT_FIELDS = SAL_DRAFT_FIELDS.concat(LED_DRAFT_FIELDS);
+function val(id){ var e = $(id); return e ? String(e.value == null ? '' : e.value) : ''; }
+function readDraft(){
+  try{
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return null;
+    var d = JSON.parse(raw);
+    return (d && typeof d === 'object') ? d : null;
+  }catch(e){ return null; }
+}
+function writeDraft(){
+  var d = { savedAt: new Date().toISOString() }, any = false;
+  DRAFT_FIELDS.forEach(function(id){
+    var v = val(id); d[id] = v; if(v) any = true;
+  });
+  try{
+    if(any) localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    else localStorage.removeItem(DRAFT_KEY);
+  }catch(e){}
+}
+function bindDraftInputs(){
+  DRAFT_FIELDS.forEach(function(id){
+    var el = $(id); if(!el) return;
+    el.addEventListener('input', writeDraft);
+    el.addEventListener('change', writeDraft);
+  });
+}
+function restoreDrafts(){
+  var d = readDraft(); if(!d) return;
+  var filled = false;
+  DRAFT_FIELDS.forEach(function(id){
+    var el = $(id); if(!el) return;
+    if(d[id] && !el.value){ el.value = d[id]; filled = true; }
+  });
+  if(filled){
+    renderCatOptions($('led-f-cat'), $('led-f-type').value);
+    toast('已恢复上次未提交的录入草稿');
+  }
+}
+function clearSalaryDraft(){
+  SAL_DRAFT_FIELDS.forEach(function(id){ var el = $(id); if(el) el.value = ''; });
+  writeDraft();
+}
+function clearLedgerDraft(){
+  ['led-f-amt','led-f-title','led-f-note'].forEach(function(id){ var el = $(id); if(el) el.value = ''; });
+  writeDraft();
+}
+
+/* ---- 登录守卫横幅：刚从登录墙回来 / 访客模式提示 ---- */
+function showAuthBanner(html){
+  var banner = $('auth-banner'), txt = $('auth-banner-text');
+  if(!banner || !txt) return;
+  txt.innerHTML = html;
+  banner.hidden = false;
+}
+function checkWriteReturn(){
+  var m = readWriteMark();
+  if(!m) return;
+  try{ localStorage.removeItem(WRITE_FLAG); }catch(e){}
+  showAuthBanner('检测到「' + esc(m.label || '提交') + '」未成功写入。网络已恢复，请核对表单后<b>再次点击提交</b>即可。');
+}
+function maybeGuestTip(){
+  try{ if(sessionStorage.getItem('wb_dataws_guest_tipped')) return; }catch(e){}
+  setTimeout(function(){
+    try{ sessionStorage.setItem('wb_dataws_guest_tipped','1'); }catch(e){}
+    var banner = $('auth-banner');
+    if(!banner || !banner.hidden) return;
+    if(isLoggedIn()) return; /* 已登录无需提示 */
+    showAuthBanner('当前为<b>访客模式</b>：可查看全部数据；<b>新增 / 修改 / 删除</b>需先<b>登录</b>（右上角）。密码由管理员设置，不开放自助注册。');
+  }, 1600);
+}
+
+/* ============ 设置：数据源管理 ============ */
+var SOURCES_KEY = 'wb_dataws_sources';
+function loadSources(){
+  try{
+    var raw = localStorage.getItem(SOURCES_KEY);
+    state.sources = raw ? JSON.parse(raw) : [];
+  }catch(e){ state.sources = []; }
+  if(!Array.isArray(state.sources)) state.sources = [];
+}
+function saveSources(){
+  try{ localStorage.setItem(SOURCES_KEY, JSON.stringify(state.sources)); }catch(e){}
+}
+function makeId(){ return 'src_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7); }
+function addSource(type, name, value){
+  if(!name.trim() || !value.trim()){ toast('名称和地址/路径不能为空'); return; }
+  state.sources.push({ id: makeId(), type: type, name: name.trim(), value: value.trim(), enabled: true });
+  saveSources(); renderSources();
+}
+function deleteSource(id){
+  state.sources = state.sources.filter(function(s){ return s.id !== id; });
+  saveSources(); renderSources();
+}
+function toggleSource(id, enabled){
+  state.sources.forEach(function(s){ if(s.id === id) s.enabled = enabled; });
+  saveSources(); renderSources();
+}
+function renderSources(){
+  var tencent = state.sources.filter(function(s){ return s.type === 'tencent'; });
+  var local = state.sources.filter(function(s){ return s.type === 'local'; });
+  $('src-tencent-list').innerHTML = renderSourceList(tencent, 'tencent');
+  $('src-local-list').innerHTML = renderSourceList(local, 'local');
+}
+function renderSourceList(list, type){
+  if(!list.length) return '<div class="src-empty">暂无' + (type === 'tencent' ? '腾讯文档' : '本地文档') + '源</div>';
+  return list.map(function(s){
+    return '<div class="src-item" data-sid="' + esc(s.id) + '">' +
+      '<span class="type-chip">' + (type === 'tencent' ? '腾讯文档' : '本地') + '</span>' +
+      '<div class="meta"><div class="name">' + esc(s.name) + '</div><div class="path">' + esc(s.value) + '</div></div>' +
+      '<label class="switch"><input type="checkbox" data-toggle="' + esc(s.id) + '"' + (s.enabled ? ' checked' : '') + '><span class="slider"></span></label>' +
+      '<button class="btn btn-sm btn-danger" data-del="' + esc(s.id) + '" type="button">删除</button>' +
+      '</div>';
+  }).join('');
+}
+function openSettings(){ switchTab('import'); }
+
+/* ============ 账号体系（Cloudflare Pages 版，密码哈希存服务端，token 存浏览器） ============ */
+function hashPwd(pwd){ return String(pwd); } // 仅占位，前端不再做密码哈希
+function loadUsers(){
+  return apiCall('/api/admin/users').then(function(r){
+    state.users = r.httpOk ? r.body.users : [];
+    return state.users;
+  }).catch(function(){ state.users = []; return []; });
+}
+function saveUsers(){ return Promise.resolve(); }
+function loadSession(){
+  var t = getToken();
+  if(t){
+    return apiCall('/api/auth/me').then(function(r){
+      if(r.httpOk){ state.currentUser = r.body.user; return true; }
+      state.currentUser = null; setToken(''); return false;
+    }).catch(function(){ state.currentUser = null; setToken(''); return false; });
+  }
+  return Promise.resolve(false);
+}
+function saveSession(uid){ /* token 已由 loginUser 写入 sessionStorage，此处无需操作 */ return Promise.resolve(); }
+/* 角色：发起人 / 审批人（可双重）；admin 为管理员，拥有全部权限 */
+var ROLE_APPLICANT = '发起人';
+var ROLE_APPROVER = '审批人';
+function currentUserName(){ return state.currentUser ? state.currentUser.name : ''; }
+function isLoggedIn(){ return !!state.currentUser; }
+function isAdmin(){ return !!(state.currentUser && state.currentUser.admin); }
+function userRoles(u){
+  if(!u) return [];
+  if(u.admin) return [ROLE_APPLICANT, ROLE_APPROVER];
+  return Array.isArray(u.roles) ? u.roles : [];
+}
+function hasRole(u, role){ return u && (u.admin || userRoles(u).indexOf(role) !== -1); }
+function canApply(){ return hasRole(state.currentUser, ROLE_APPLICANT); }
+function canApprove(){ return hasRole(state.currentUser, ROLE_APPROVER); }
+function approvalApproverNames(){
+  var m = {};
+  state.users.forEach(function(u){ if(hasRole(u, ROLE_APPROVER)) m[u.name] = 1; });
+  return Object.keys(m).sort();
+}
+function ensureAdmin(){
+  return apiCall('/api/admin/bootstrap', { method: 'POST', body: JSON.stringify({ password: 'admin123' }) })
+    .then(function(r){
+      if(r.status === 409) return; // 已有用户，跳过
+      if(r.httpOk){ toast('管理员账号「村长」已初始化，初始密码 admin123，请尽快登录修改'); }
+    }).catch(function(){});
+}
+/* 一次性迁移：清除上一版自助注册时代的演示账号/单据，避免与管理员体系混淆 */
+function migrateCleanDemo(){ return Promise.resolve(); }
+function loginUser(name, pwd){
+  name = String(name || '').trim();
+  return apiCall('/api/auth/login', { method: 'POST', body: JSON.stringify({ name: name, password: pwd }) })
+    .then(function(r){
+      if(!r.httpOk){ toast(r.body.msg || '登录失败'); return false; }
+      setToken(r.body.token);
+      state.currentUser = r.body.user;
+      renderUser(); renderApproval();
+      toast('已登录：' + name + (r.body.user.admin ? '（管理员）' : ''));
+      return true;
+    }).catch(function(e){ toast('网络异常，请检查连接'); return false; });
+}
+function adminCreateUser(name, pwd, roles){
+  if(!isAdmin()){ toast('仅管理员可创建账号'); return false; }
+  name = String(name || '').trim();
+  if(name.length < 2){ toast('用户名至少 2 个字符'); return false; }
+  if(!pwd || String(pwd).length < 4){ toast('初始密码至少 4 位'); return false; }
+  if(!roles.length){ toast('请至少勾选一个角色（发起人 / 审批人）'); return false; }
+  var rRoles = roles.map(function(r){
+    if(r === ROLE_APPLICANT) return 'initiator';
+    if(r === ROLE_APPROVER) return 'approver';
+    return r;
+  });
+  return apiCall('/api/admin/users', { method: 'POST', body: JSON.stringify({ name: name, password: pwd, roles: rRoles }) })
+    .then(function(r){
+      if(!r.httpOk){ toast(r.body.msg || '创建失败'); return false; }
+      loadUsers();
+      toast('账号「' + name + '」已创建，角色：' + roles.join('、'));
+      return true;
+    }).catch(function(){ toast('网络异常'); return false; });
+}
+function adminResetPwd(uid){
+  if(!isAdmin()) return;
+  var u = state.users.filter(function(x){ return x.id === uid; })[0];
+  if(!u) return;
+  var np = window.prompt('为「' + u.name + '」设置新密码（至少 4 位）：');
+  if(np === null) return;
+  np = String(np || '');
+  if(np.length < 4){ toast('密码至少 4 位，未修改'); return; }
+  // 通过创建同名用户来"重置"（Worker 端先删后建）
+  apiCall('/api/admin/users/' + encodeURIComponent(uid), { method: 'DELETE' })
+    .then(function(){
+      return adminCreateUser(u.name, np, u.roles || []);
+    }).catch(function(){ toast('网络异常'); });
+}
+function adminDeleteUser(uid){
+  if(!isAdmin()) return;
+  var u = state.users.filter(function(x){ return x.id === uid; })[0];
+  if(!u) return;
+  if(u.admin){ toast('不能删除管理员账号'); return; }
+  if(!confirm('确定删除账号「' + u.name + '」？历史报销单中的姓名会保留留痕。')) return;
+  apiCall('/api/admin/users/' + encodeURIComponent(uid), { method: 'DELETE' })
+    .then(function(){
+      loadUsers();
+      if(state.currentUser && state.currentUser.id === uid){ state.currentUser = null; setToken(''); }
+      renderUser(); renderApproval(); openAdminPanel();
+      toast('已删除账号「' + u.name + '」');
+    }).catch(function(){ toast('网络异常'); });
+}
+function logoutUser(){
+  state.currentUser = null; setToken('');
+  renderUser(); renderApproval();
+  toast('已退出登录');
+}
+function renderUser(){
+  var b = $('btn-user');
+  if(!b) return;
+  if(isLoggedIn()){
+    b.innerHTML = icon('user','ic-sm') + '<span style="max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(currentUserName()) + '</span>' + icon('logout','ic-sm');
+    b.title = '当前登录：' + currentUserName() + (isAdmin() ? '（管理员）' : '') + '（点击退出）';
+  }else{
+    b.innerHTML = icon('user','ic-sm') + '登录';
+    b.title = '登录';
+  }
+}
+function openAuthModal(){
+  $('modal-title').textContent = '登录账号';
+  $('modal-save').textContent = '登录';
+  $('modal-body').innerHTML =
+    '<div class="form" style="grid-template-columns:1fr">' +
+      '<label class="fld">用户名<input type="text" id="auth-name" placeholder="请输入用户名" autocomplete="username" maxlength="20"></label>' +
+      '<label class="fld">密码<input type="password" id="auth-pwd" placeholder="请输入密码" autocomplete="current-password" onkeydown="if(event.key===\'Enter\'){event.preventDefault();document.getElementById(\'modal-save\').click();}"></label>' +
+      '<div class="note" style="margin-top:-2px">账号由管理员统一开通，<strong>不开放自助注册</strong>。没有账号请联系管理员创建并分配角色（发起人 / 审批人）。密码经哈希后存储于服务端，安全可跨设备登录。</div>' +
+    '</div>';
+  state.modalSubmit = function(){
+    loginUser($('auth-name').value, $('auth-pwd').value).then(function(ok){ if(ok) closeModal(); });
+  };
+  $('modal').hidden = false;
+  setTimeout(function(){ var el = $('auth-name'); if(el) el.focus(); }, 60);
+}
+function roleChips(u){
+  if(u.admin) return '<span class="role-chip admin">管理员</span><span class="role-chip">发起人</span><span class="role-chip">审批人</span>';
+  return userRoles(u).map(function(r){
+    var cls = r === ROLE_APPROVER ? ' approver' : ' applicant';
+    return '<span class="role-chip' + cls + '">' + esc(r) + '</span>';
+  }).join('');
+}
+function openAdminPanel(){
+  if(!isAdmin()){ toast('仅管理员可访问'); return; }
+  return loadUsers().then(function(){
+    $('modal-title').textContent = '账号与权限管理';
+    $('modal-save').textContent = '创建账号';
+    var listHtml = state.users.map(function(u){
+      var acts = u.admin
+        ? '<span style="font-size:12px;color:var(--text-3)">内置管理员</span>'
+        : '<button class="btn btn-sm btn-ghost" data-adminact="reset" data-uid="' + esc(u.id) + '" type="button">重置密码</button>' +
+          '<button class="btn btn-sm btn-danger" data-adminact="del" data-uid="' + esc(u.id) + '" type="button">删除</button>';
+      return '<div class="src-item admin-user-row">' +
+        '<div class="meta"><div class="name">' + esc(u.name) + '</div><div style="margin-top:4px">' + roleChips(u) + '</div></div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">' + acts + '</div>' +
+      '</div>';
+    }).join('');
+    $('modal-body').innerHTML =
+      '<div class="note" style="margin-top:0">管理员创建账号并分配角色：<b>发起人</b>可提交报销；<b>审批人</b>可被选为审核人；两者可同时勾选（双重身份）。审批链支持一级、二级审核。</div>' +
+      '<div class="form" style="grid-template-columns:1fr 1fr;margin-top:14px">' +
+        '<label class="fld">用户名<input type="text" id="adm-name" placeholder="新账号用户名" maxlength="20"></label>' +
+        '<label class="fld">初始密码<input type="password" id="adm-pwd" placeholder="至少 4 位" autocomplete="new-password"></label>' +
+        '<div class="fld" style="grid-column:1/-1;display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +
+          '<span style="font-size:13px;color:var(--text-2);font-weight:600">分配角色：</span>' +
+          '<label style="display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="adm-role-applicant" checked> 发起人（可提交报销）</label>' +
+          '<label style="display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="adm-role-approver"> 审批人（可审核报销）</label>' +
+        '</div>' +
+      '</div>' +
+      '<h4 style="font-size:14px;margin:20px 0 10px">现有账号（' + state.users.length + '）</h4>' +
+      '<div class="src-list" id="admin-user-list">' + listHtml + '</div>';
+    state.modalSubmit = function(){
+      var roles = [];
+      if($('adm-role-applicant').checked) roles.push(ROLE_APPLICANT);
+      if($('adm-role-approver').checked) roles.push(ROLE_APPROVER);
+      adminCreateUser($('adm-name').value, $('adm-pwd').value, roles).then(function(ok){
+        if(ok) openAdminPanel();
+      });
+    };
+    $('modal').hidden = false;
+    var body = $('modal-body');
+    body.onclick = function(e){
+      var btn = e.target.closest ? e.target.closest('button[data-adminact]') : null;
+      if(!btn) return;
+      var act = btn.getAttribute('data-adminact'), uid = btn.getAttribute('data-uid');
+      if(act === 'reset') adminResetPwd(uid);
+      else if(act === 'del') adminDeleteUser(uid);
+    };
+  });
+}
+
+/* ============ 审批体系（报销留痕） ============ */
+var APPROVAL_KEY = 'wb_dataws_approvals';
+function loadApprovals(){
+  try{
+    var raw = localStorage.getItem(APPROVAL_KEY);
+    state.approvals = raw ? JSON.parse(raw) : [];
+  }catch(e){ state.approvals = []; }
+  if(!Array.isArray(state.approvals)) state.approvals = [];
+}
+function saveApprovals(){
+  try{ localStorage.setItem(APPROVAL_KEY, JSON.stringify(state.approvals)); }catch(e){}
+}
+function apNowStr(){
+  var d = new Date(), p = function(x){ return (x < 10 ? '0' : '') + x; };
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function submitApproval(){
+  if(!isLoggedIn()){ openAuthModal(); return; }
+  if(!canApply()){ toast('你的账号没有「发起人」权限，请联系管理员开通'); return; }
+  var title = $('ap-f-title').value.trim();
+  var amount = num($('ap-f-amount').value);
+  var category = $('ap-f-category').value;
+  var approver1 = $('ap-f-approver').value;
+  var approver2 = $('ap-f-approver2') ? $('ap-f-approver2').value : '';
+  var note = $('ap-f-note').value.trim();
+  if(!title){ toast('请填写报销事由'); return; }
+  if(amount <= 0){ toast('请填写正确的报销金额'); return; }
+  if(!approver1){ toast('请选择一级审批人'); return; }
+  if(approver1 === currentUserName()){ toast('审批人不能是自己'); return; }
+  if(approver2){
+    if(approver2 === currentUserName()){ toast('二级审批人不能是自己'); return; }
+    if(approver2 === approver1){ toast('二级审批人不能与一级相同'); return; }
+  }
+  var chain = [ { name: approver1, status: 'pending', decidedAt: '', note: '' } ];
+  if(approver2) chain.push({ name: approver2, status: 'pending', decidedAt: '', note: '' });
+  state.approvals.unshift({
+    id: 'ap_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    title: title, amount: amount, category: category, note: note,
+    applicant: currentUserName(),
+    chain: chain, level: 0, status: 'pending',
+    createdAt: apNowStr(), decidedAt: ''
+  });
+  saveApprovals();
+  $('ap-f-title').value = ''; $('ap-f-amount').value = ''; $('ap-f-note').value = '';
+  if($('ap-f-approver2')) $('ap-f-approver2').value = '';
+  toast('报销申请已提交，等待「' + approver1 + '」' + (approver2 ? '一审' : '审批'));
+  refreshAll();
+}
+function apCurrentStep(rec){
+  if(rec.status !== 'pending') return null;
+  return rec.chain[rec.level] || null;
+}
+function decideApproval(id, pass){
+  if(!isLoggedIn()){ openAuthModal(); return; }
+  if(!canApprove()){ toast('你的账号没有「审批人」权限'); return; }
+  var rec = state.approvals.filter(function(a){ return a.id === id; })[0];
+  if(!rec || rec.status !== 'pending') return;
+  var step = apCurrentStep(rec);
+  if(!step || step.name !== currentUserName()){ toast('只有当前环节的审批人可以处理'); return; }
+  var stepLabel = (rec.level + 1) + ' 审';
+  $('modal-title').textContent = (pass ? '通过' : '驳回') + '（' + stepLabel + '）：' + rec.title;
+  $('modal-save').textContent = pass ? '确认通过' : '确认驳回';
+  var chainInfo = rec.chain.map(function(c, i){
+    return (i + 1) + '审·' + esc(c.name) +
+      (c.status === 'approved' ? ' ✓' : (c.status === 'rejected' ? ' ✗' : ' …'));
+  }).join('　');
+  $('modal-body').innerHTML =
+    '<div class="form" style="grid-template-columns:1fr">' +
+      '<div class="note" style="margin-top:0">金额 <b style="color:var(--expense)">' + fmtMoney(rec.amount) + '</b>　分类 ' + esc(rec.category) + '　发起人 ' + esc(rec.applicant) + '</div>' +
+      '<div class="note" style="margin-top:-4px">审批链：' + chainInfo + (rec.level < rec.chain.length - 1 ? '　<span style="color:var(--warn)">本次通过后将进入下一审核人</span>' : '') + '</div>' +
+      '<label class="fld">审批意见（留痕）<input type="text" id="ap-decide-note" placeholder="如：同意 / 票据不全请补" maxlength="120"></label>' +
+    '</div>';
+  state.modalSubmit = function(){
+    var note = $('ap-decide-note').value.trim();
+    step.status = pass ? 'approved' : 'rejected';
+    step.decidedAt = apNowStr();
+    step.note = note;
+    if(!pass){
+      rec.status = 'rejected'; rec.decidedAt = apNowStr();
+      saveApprovals(); closeModal();
+      toast('已驳回，报销单进入已完成列表');
+      refreshAll();
+      return;
+    }
+    if(rec.level < rec.chain.length - 1){
+      rec.level++;
+      var next = rec.chain[rec.level];
+      saveApprovals(); closeModal();
+      toast('已通过' + stepLabel + '，流转至下一审核人「' + next.name + '」');
+      refreshAll();
+    }else{
+      rec.status = 'approved'; rec.decidedAt = apNowStr();
+      saveApprovals(); closeModal();
+      toast('全部审核通过，报销单进入已完成列表');
+      refreshAll();
+    }
+  };
+  $('modal').hidden = false;
+}
+function apRowsForSeg(){
+  var me = currentUserName();
+  if(state.apSeg === 'todo'){
+    return state.approvals.filter(function(a){
+      var s = apCurrentStep(a);
+      return a.status === 'pending' && s && s.name === me;
+    }).sort(function(a,b){ return b.createdAt.localeCompare(a.createdAt); });
+  }
+  if(state.apSeg === 'mine'){
+    return state.approvals.filter(function(a){ return a.applicant === me; })
+      .sort(function(a,b){ return b.createdAt.localeCompare(a.createdAt); });
+  }
+  return state.approvals.filter(function(a){ return a.status !== 'pending'; })
+    .sort(function(a,b){ return String(b.decidedAt).localeCompare(String(a.decidedAt)); });
+}
+function apStatusPill(rec){
+  if(rec.status === 'approved') return '<span class="pill ok">已通过</span>';
+  if(rec.status === 'rejected') return '<span class="pill bad">已驳回</span>';
+  return '<span class="pill mid">' + (rec.level > 0 ? '二审中' : '待审批') + '</span>';
+}
+function apChainSummary(rec){
+  return rec.chain.map(function(c, i){
+    var mark = c.status === 'approved' ? '<span style="color:var(--income)">✓</span>'
+      : (c.status === 'rejected' ? '<span style="color:var(--expense)">✗</span>' : '<span style="color:var(--text-3)">…</span>');
+    return (i + 1) + '审 ' + esc(c.name) + ' ' + mark;
+  }).join('<br>');
+}
+function apChainFull(rec){
+  return rec.chain.map(function(c, i){
+    var st = c.status === 'approved' ? '<span style="color:var(--income)">通过</span>'
+      : (c.status === 'rejected' ? '<span style="color:var(--expense)">驳回</span>' : '—');
+    return '<div style="margin:3px 0;font-size:12.5px">' +
+      (i + 1) + '审 ' + esc(c.name) + '：' + st +
+      (c.decidedAt ? ' <span style="color:var(--text-3)">' + esc(c.decidedAt) + '</span>' : '') +
+      (c.note ? ' <span style="color:var(--text-2)">「' + esc(c.note) + '」</span>' : '') +
+      '</div>';
+  }).join('');
+}
+function renderApprovalApproverOptions(){
+  var names = approvalApproverNames().filter(function(n){ return n !== currentUserName(); });
+  function fill(id, cur, withEmpty){
+    var sel = $(id);
+    if(!sel) return;
+    var html = withEmpty ? '<option value="">' + (id === 'ap-f-approver2' ? '不设二级审核' : '选择审批人…') + '</option>' : '';
+    names.forEach(function(n){ html += '<option value="' + esc(n) + '"' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>'; });
+    sel.innerHTML = html;
+  }
+  fill('ap-f-approver', $('ap-f-approver').value, true);
+  fill('ap-f-approver2', $('ap-f-approver2') ? $('ap-f-approver2').value : '', true);
+}
+function renderApprovalKpis(){
+  if(!isLoggedIn()) return;
+  var me = currentUserName(), mk = todayMonth();
+  var todo = state.approvals.filter(function(a){
+    var s = apCurrentStep(a);
+    return a.status === 'pending' && s && s.name === me;
+  }).length;
+  var mine = state.approvals.filter(function(a){ return a.status === 'pending' && a.applicant === me; }).length;
+  var doneAmt = 0, rej = 0;
+  state.approvals.forEach(function(a){
+    if(a.status === 'approved' && String(a.decidedAt).slice(0,7) === mk) doneAmt += num(a.amount);
+    if(a.status === 'rejected' && String(a.decidedAt).slice(0,7) === mk) rej++;
+  });
+  $('ap-kpi-todo').textContent = todo;
+  $('ap-kpi-mine').textContent = mine;
+  $('ap-kpi-done').textContent = fmtMoney(doneAmt);
+  $('ap-kpi-rej').textContent = rej;
+}
+function renderApprovalTable(){
+  var thead = $('ap-thead'), tbody = $('ap-tbody');
+  if(!thead || !tbody) return;
+  tbody.innerHTML = '';
+  var seg = state.apSeg;
+  if(seg === 'done'){
+    thead.innerHTML = '<tr><th>事由</th><th class="num">金额</th><th>分类</th><th>发起人</th><th>审核链 / 留痕</th><th>结果</th><th>完结时间</th></tr>';
+  }else{
+    thead.innerHTML = '<tr><th>事由</th><th class="num">金额</th><th>分类</th><th>发起人</th><th>审核链</th><th>提交时间</th><th>状态</th><th></th></tr>';
+  }
+  var rows = apRowsForSeg();
+  if(!rows.length){
+    var msg = seg === 'todo' ? '没有待你审批的报销单' : (seg === 'mine' ? '你还没有发起过报销' : '暂无已完成的报销单');
+    var col = seg === 'done' ? 7 : 8;
+    tbody.innerHTML = '<tr><td colspan="' + col + '" class="empty">' + msg + '</td></tr>';
+    return;
+  }
+  rows.forEach(function(a){
+    var tr = document.createElement('tr');
+    if(seg === 'done'){
+      tr.innerHTML =
+        '<td>' + esc(a.title) + '</td>' +
+        '<td class="num amt neg">' + fmtMoney(a.amount) + '</td>' +
+        '<td>' + esc(a.category) + '</td>' +
+        '<td>' + esc(a.applicant) + '</td>' +
+        '<td>' + apChainFull(a) + '</td>' +
+        '<td>' + apStatusPill(a) + '</td>' +
+        '<td style="white-space:nowrap;color:var(--text-3);font-size:12.5px">' + esc(a.decidedAt || '-') + '</td>';
+    }else{
+      var step = apCurrentStep(a);
+      var canAct = a.status === 'pending' && step && step.name === currentUserName();
+      tr.innerHTML =
+        '<td>' + esc(a.title) + (a.note ? '<div style="font-size:12px;color:var(--text-3);margin-top:2px">' + esc(a.note) + '</div>' : '') + '</td>' +
+        '<td class="num amt neg">' + fmtMoney(a.amount) + '</td>' +
+        '<td>' + esc(a.category) + '</td>' +
+        '<td>' + esc(a.applicant) + '</td>' +
+        '<td style="font-size:12.5px;line-height:1.6">' + apChainSummary(a) + '</td>' +
+        '<td style="white-space:nowrap;color:var(--text-3);font-size:12.5px">' + esc(a.createdAt) + '</td>' +
+        '<td>' + apStatusPill(a) + '</td>' +
+        '<td style="white-space:nowrap;text-align:right">' +
+          (canAct
+            ? '<button class="btn btn-sm btn-settle" data-apok="' + esc(a.id) + '" type="button">通过</button> ' +
+              '<button class="btn btn-sm btn-danger" data-apno="' + esc(a.id) + '" type="button">驳回</button>'
+            : (a.applicant === currentUserName()
+                ? '<span style="font-size:12px;color:var(--text-3)">' + (step ? '等待 ' + esc(step.name) + (a.level > 0 ? ' 二审' : ' 审批') : '') + '</span>'
+                : '<span style="font-size:12px;color:var(--text-3)">—</span>')) +
+        '</td>';
+    }
+    tbody.appendChild(tr);
+  });
+}
+function renderApprovalSeg(){
+  var btns = $('ap-seg') ? $('ap-seg').getElementsByTagName('button') : [];
+  for(var i = 0; i < btns.length; i++){
+    btns[i].className = btns[i].getAttribute('data-apseg') === state.apSeg ? 'on' : '';
+  }
+}
+function renderApproval(){
+  var guest = $('approval-guest'), main = $('approval-main');
+  if(!guest || !main) return;
+  if(!isLoggedIn()){
+    guest.hidden = false; main.hidden = true;
+    var tab = $('tab-approval');
+    if(tab) tab.innerHTML = '报销审批';
+    return;
+  }
+  guest.hidden = true; main.hidden = false;
+  /* 顶部当前账号与管理员入口 */
+  var nameEl = $('ap-current-name');
+  if(nameEl) nameEl.textContent = currentUserName() + (isAdmin() ? '（管理员）' : '');
+  var rolesEl = $('ap-current-roles');
+  if(rolesEl) rolesEl.textContent = isAdmin() ? '· 全部权限' : ('· ' + (userRoles(state.currentUser).join('、') || '无角色'));
+  var adminEntry = $('ap-admin-entry');
+  if(adminEntry) adminEntry.hidden = !isAdmin();
+  /* 角色：无发起权限则禁用提交表单 */
+  var formCard = $('ap-form-card');
+  if(formCard){
+    formCard.style.opacity = canApply() ? '' : '0.62';
+    formCard.style.pointerEvents = canApply() ? '' : 'none';
+  }
+  var formBtn = $('ap-submit');
+  if(formBtn){
+    formBtn.disabled = !canApply();
+    formBtn.title = canApply() ? '' : '你的账号无「发起人」权限，请联系管理员开通';
+  }
+  renderApprovalSeg();
+  renderApprovalApproverOptions();
+  renderApprovalKpis();
+  renderApprovalTable();
+  var todoN = state.approvals.filter(function(a){
+    var s = apCurrentStep(a);
+    return a.status === 'pending' && s && s.name === currentUserName();
+  }).length;
+  $('tab-approval').innerHTML = '报销审批' + (todoN ? '<span class="badge">' + todoN + '</span>' : '');
+}
+
+/* ============ 事件绑定 ============ */
+function bindEvents(){
+  $('btn-theme').innerHTML = icon('sun') + '主题';
+  $('btn-export').innerHTML = icon('down') + '导出 JSON';
+  $('btn-import').innerHTML = icon('up') + '导入 JSON';
+  $('btn-settings').innerHTML = icon('gear') + '设置';
+  $('tab-ledger').innerHTML = '鼎知堂';
+  $('tab-salary').innerHTML = '工资管理 <svg viewBox="0 0 24 24" style="width:11px;height:11px;vertical-align:-1px;opacity:.7" aria-hidden="true"><path d="M14 5h5v5 M19 5l-9 9 M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $('tab-pending').innerHTML = '待处理';
+  $('tab-approval').innerHTML = '报销审批';
+
+  $('btn-theme').onclick = function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var nx = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nx);
+    try{ localStorage.setItem('wb_dataws_theme', nx); }catch(e){}
+    refreshAll();
+  };
+  $('btn-export').onclick = exportJSON;
+  $('btn-import').onclick = function(){ $('json-file').click(); };
+  $('json-file').onchange = function(){
+    if(this.files && this.files[0]) importJSON(this.files[0]);
+    this.value = '';
+  };
+
+  $('tab-ledger').onclick = function(){ switchTab('ledger'); };
+  $('tab-salary').onclick = function(e){
+    if(e) e.preventDefault();
+    window.open('/salary/', '_blank', 'noopener');
+  };
+  $('tab-pending').onclick = function(){ switchTab('pending'); };
+  $('tab-approval').onclick = function(){ switchTab('approval'); };
+
+  $('btn-settings').onclick = openSettings;
+  var abx = $('auth-banner-x');
+  if(abx) abx.onclick = function(){ $('auth-banner').hidden = true; };
+  $('import-back').onclick = function(){ switchTab('pending'); };
+  $('add-tencent-btn').onclick = function(){
+    addSource('tencent', $('add-tencent-name').value, $('add-tencent-url').value);
+    $('add-tencent-name').value = ''; $('add-tencent-url').value = '';
+  };
+  $('add-local-btn').onclick = function(){
+    addSource('local', $('add-local-name').value, $('add-local-path').value);
+    $('add-local-name').value = ''; $('add-local-path').value = '';
+  };
+  $('src-tencent-list').onclick = $('src-local-list').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button[data-del]') : null;
+    if(b){ deleteSource(b.getAttribute('data-del')); return; }
+  };
+  $('src-tencent-list').onchange = $('src-local-list').onchange = function(e){
+    var t = e.target;
+    if(t && t.getAttribute('data-toggle')) toggleSource(t.getAttribute('data-toggle'), t.checked);
+  };
+
+  /* 账号体系 */
+  $('btn-user').onclick = function(){
+    if(isLoggedIn()){
+      if(confirm('确定退出登录账号「' + currentUserName() + '」？')) logoutUser();
+    }else{
+      openAuthModal();
+    }
+  };
+  var agl = $('approval-guest-login');
+  if(agl) agl.onclick = function(){ openAuthModal(); };
+  var aae = $('ap-admin-entry');
+  if(aae) aae.onclick = openAdminPanel;
+
+  /* 审批体系 */
+  $('ap-submit').onclick = submitApproval;
+  $('ap-seg').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button[data-apseg]') : null;
+    if(!b) return;
+    state.apSeg = b.getAttribute('data-apseg');
+    refreshAll();
+  };
+  $('ap-tbody').onclick = function(e){
+    var ok = e.target.closest ? e.target.closest('button[data-apok]') : null;
+    var no = e.target.closest ? e.target.closest('button[data-apno]') : null;
+    if(ok) decideApproval(ok.getAttribute('data-apok'), true);
+    else if(no) decideApproval(no.getAttribute('data-apno'), false);
+  };
+
+  $('sal-lock-btn').onclick = function(){
+    if(state.salaryUnlocked){ state.salaryUnlocked = false; refreshAll(); toast('已隐藏工资金额'); }
+    else { openSalaryLockModal(); }
+  };
+  $('sal-pwd-btn').onclick = openSalaryChangePwd;
+
+  document.addEventListener('change', function(e){
+    var t = e.target;
+    if(!t || !t.classList || !t.classList.contains('ck') || !t.getAttribute) return;
+    var id = t.getAttribute('data-id');
+    var all = t.getAttribute('data-selall');
+    if(all){
+      var rows, set;
+      if(all === 'salary'){ rows = filteredSalary(); set = state.selSal; }
+      else if(all === 'ledger'){ rows = ledgerTableFiltered(); set = state.selLed; }
+      else { return; }
+      rows.forEach(function(r){ if(r && r._id) set[r._id] = t.checked; });
+      refreshAll();
+    }else if(id){
+      var kind2 = t.getAttribute('data-sel');
+      if(kind2 !== 'salary' && kind2 !== 'ledger') return;
+      var set2 = kind2 === 'salary' ? state.selSal : state.selLed;
+      if(t.checked) set2[id] = true; else delete set2[id];
+      renderBatchBar();
+      syncSelAll(kind2);
+    }
+  });
+
+  $('batch-bar').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    var act = b.getAttribute('data-bact'); if(!act) return;
+    if(act === 'selall-sal'){ selAll('salary', filteredSalary()); refreshAll(); }
+    else if(act === 'selall-led'){ selAll('ledger', ledgerTableFiltered()); refreshAll(); }
+    else if(act === 'del-sal'){ batchDelete('salary'); }
+    else if(act === 'del-led'){ batchDelete('ledger'); }
+    else if(act === 'settle-sal'){ batchSettle(true); }
+    else if(act === 'unsettle-sal'){ batchSettle(false); }
+  };
+
+  $('sal-scope').onclick = function(e){
+    var b = e.target;
+    if(b.tagName !== 'BUTTON') return;
+    state.salScope = b.getAttribute('data-scope');
+    if(state.salScope === 'total') state.salYear = '';
+    refreshAll();
+  };
+  $('sal-year').onchange = function(){ state.salYear = this.value; refreshAll(); };
+
+  $('sal-refill').onclick = function(){
+    var targets = state.salary.filter(function(r){
+      return Math.abs(num(r['未发金额']) - (num(r['应发工资']) - num(r['已发金额']))) > 0.005;
+    });
+    if(!targets.length){ toast('所有月份的未发金额已与差额一致'); return; }
+    var i = 0, ok = 0;
+    function next(){
+      if(i >= targets.length){
+        toast('已回填 ' + ok + ' 个月份');
+        return reloadAll().then(refreshAll);
+      }
+      var r = targets[i++];
+      return updateSalaryRecord(r._id, {
+        '未发金额': { number: num(r['应发工资']) - num(r['已发金额']) },
+        '发放状态': { select: deriveStatus(num(r['应发工资']), num(r['已发金额'])) }
+      }).then(function(){ ok++; }, function(){}).then(next);
+    }
+    next();
+  };
+
+  $('sal-add').onclick = function(){
+    var month = $('sal-f-month').value.trim();
+    if(!/^\d{4}-\d{2}$/.test(month)){ toast('月份格式应为 YYYY-MM，如 2026-08'); return; }
+    var dup = state.salary.some(function(r){ return String(r['月份']) === month; });
+    if(dup){ toast('该月份已存在，请在表格中编辑'); return; }
+    var due = num($('sal-f-due').value), paid = num($('sal-f-paid').value);
+    addSalaryRecord({
+      '月份': { text: month },
+      '应发工资': { number: due },
+      '已发金额': { number: paid },
+      '未发金额': { number: due - paid },
+      '发放状态': { select: deriveStatus(due, paid) },
+      '备注': { text: $('sal-f-note').value.trim() }
+    }).then(function(){
+      $('sal-f-month').value = ''; $('sal-f-due').value = ''; $('sal-f-paid').value = ''; $('sal-f-note').value = '';
+      clearSalaryDraft();
+      toast('已添加 ' + month);
+      return reloadAll();
+    }).then(refreshAll).catch(function(){ toast('添加失败，请重试'); });
+  };
+
+  $('sal-tbody').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    var id = b.getAttribute('data-editsal') || b.getAttribute('data-delsal');
+    if(!id) return;
+    var rec = state.salary.filter(function(r){ return r._id === id; })[0];
+    if(!rec) return;
+    if(b.getAttribute('data-editsal')) openSalaryModal(rec);
+    else if(confirm('确认删除 ' + (rec['月份'] || '该记录') + ' 的工资记录？此操作不可撤销。')){
+      deleteSalaryRecord(id)
+        .then(reloadAll).then(refreshAll).then(function(){ toast('已删除'); })
+        .catch(function(){ toast('删除失败'); });
+    }
+  };
+
+  ['led-year','led-month','led-type','led-channel'].forEach(function(id){
+    $(id).onchange = function(){
+      state.ledYear = $('led-year').value;
+      state.ledMonth = $('led-month').value;
+      state.ledType = $('led-type').value;
+      state.ledChannel = $('led-channel').value;
+      refreshAll();
+    };
+  });
+  $('led-reset').onclick = function(){
+    state.ledYear = ''; state.ledMonth = ''; state.ledType = ''; state.ledChannel = '';
+    refreshAll();
+  };
+
+  // 收支流水表格独立筛选（仅影响表格）：下拉实时生效 + 查询按钮 + 回车
+  function applyLedgerTableFilter(){
+    state.ledTableYear = $('led-table-year').value;
+    state.ledTableMonth = $('led-table-month').value;
+    state.ledTableType = $('led-table-type').value;
+    state.ledTableChannel = $('led-table-channel').value;
+    state.ledTableCategory = $('led-table-category').value;
+    state.selLed = {};
+    refreshAll();
+  }
+  ['led-table-year','led-table-month','led-table-type','led-table-channel','led-table-category'].forEach(function(id){
+    $(id).onchange = function(){
+      if(id === 'led-table-type'){
+        // 类型变更后，分类选项需按新类型重算并清空已选分类
+        state.ledTableType = $('led-table-type').value;
+        state.ledTableCategory = '';
+        renderLedgerTableControls();
+        $('led-table-category').value = '';
+      }
+      applyLedgerTableFilter();
+    };
+  });
+  var ltcQuery = function(){ applyLedgerTableFilter(); toast('已按条件查询流水'); };
+  $('led-table-query').onclick = ltcQuery;
+  $('led-table-ctl').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); ltcQuery(); }
+  });
+  $('led-table-reset').onclick = function(){
+    state.ledTableYear = ''; state.ledTableMonth = ''; state.ledTableType = '';
+    state.ledTableChannel = ''; state.ledTableCategory = '';
+    state.selLed = {};
+    renderLedgerTableControls();
+    refreshAll();
+  };
+  $('led-f-type').onchange = function(){ renderCatOptions($('led-f-cat'), this.value); };
+
+  $('led-add').onclick = function(){
+    var date = $('led-f-date').value, amt = num($('led-f-amt').value);
+    if(!date){ toast('请选择交易时间'); return; }
+    if(!(amt > 0)){ toast('金额需为大于 0 的数字'); return; }
+    addLedgerRecord({
+      '交易时间': { date: date },
+      '收支类型': { select: $('led-f-type').value || '收入' },
+      '渠道': { select: $('led-f-channel').value || '微信' },
+      '分类': { select: $('led-f-cat').value },
+      '金额': { number: amt },
+      '数据来源': { select: '手动录入' },
+      '摘要': { text: $('led-f-title').value.trim() || '未命名' },
+      '备注': { text: $('led-f-note').value.trim() }
+    }).then(function(){
+      $('led-f-amt').value = ''; $('led-f-title').value = ''; $('led-f-note').value = '';
+      clearLedgerDraft();
+      toast('已添加一笔流水');
+      return reloadAll();
+    }).then(refreshAll).catch(function(){ toast('添加失败，请重试'); });
+  };
+
+  $('led-tbody').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    var id = b.getAttribute('data-editled') || b.getAttribute('data-delled');
+    if(!id) return;
+    var rec = state.ledger.filter(function(r){ return r._id === id; })[0];
+    if(!rec) return;
+    if(b.getAttribute('data-editled')) openLedgerModal(rec);
+    else if(confirm('确认删除「' + (rec['摘要'] || '该笔流水') + '」？此操作不可撤销。')){
+      deleteLedgerRecord(id)
+        .then(reloadAll).then(refreshAll).then(function(){ toast('已删除'); })
+        .catch(function(){ toast('删除失败'); });
+    }
+  };
+
+  $('pending-list').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    var act = b.getAttribute('data-act'); if(!act) return;
+    if(act === 'goto-salary'){ switchTab('salary'); $('sal-f-month').focus(); return; }
+    if(act === 'goto-ledger'){ switchTab('ledger'); $('led-f-date').focus(); return; }
+    if(act === 'review-ocr'){
+      switchTab('ledger');
+      state.ledYear = ''; state.ledMonth = ''; state.ledType = ''; state.ledChannel = '';
+      refreshAll(); toast('已显示全部流水，来源标黄者待复核'); return;
+    }
+    if(act === 'settle'){
+      var id = b.getAttribute('data-id');
+      var rec = state.salary.filter(function(r){ return r._id === id; })[0];
+      if(!rec) return;
+      updateSalaryRecord(id, {
+        '已发金额': { number: num(rec['应发工资']) },
+        '未发金额': { number: 0 },
+        '发放状态': { select: '已结清' }
+      }).then(reloadAll).then(refreshAll).then(function(){ toast('已标记为结清'); })
+        .catch(function(){ toast('操作失败'); });
+    }
+  };
+
+  $('csv-file').onchange = function(){
+    var f = this.files && this.files[0];
+    if(!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){
+      var rows = parseCSV(String(fr.result));
+      if(rows.length < 2){ toast('CSV 内容为空或只有表头'); return; }
+      state.csv = { rows: rows };
+      renderCsvMapping();
+    };
+    fr.readAsText(f, 'utf-8');
+  };
+  $('csv-stage').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    if(b.id === 'csv-cancel'){ state.csv = null; $('csv-file').value = ''; $('csv-stage').innerHTML = ''; return; }
+    if(b.id !== 'csv-confirm') return;
+    var sels = $('csv-stage').querySelectorAll('select[data-col]');
+    var map = {};
+    for(var i = 0; i < sels.length; i++){
+      var f = sels[i].value;
+      if(f && !map[f]) map[f] = parseInt(sels[i].getAttribute('data-col'), 10);
+    }
+    if(!map['金额']){ toast('请至少映射「金额」列'); return; }
+    var list = state.csv.rows.slice(1).map(function(r){ return buildLedgerPropsFromRow(map, r); })
+      .filter(function(p){ return num(p['金额'].number) > 0; });
+    if(!list.length){ toast('未解析到有效金额，请检查列映射'); return; }
+    b.disabled = true; b.textContent = '导入中…';
+    batchAddLedger(list).then(function(){
+      state.csv = null; $('csv-file').value = ''; $('csv-stage').innerHTML = '';
+    }).catch(function(){ b.disabled = false; b.textContent = '确认导入'; });
+  };
+
+  $('paste-import').onclick = function(){
+    var lines = $('paste-box').value.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+    if(!lines.length){ toast('请先粘贴内容'); return; }
+    var list = [], bad = 0;
+    lines.forEach(function(ln){
+      var p = ln.split(/[,，\t]/).map(function(s){ return s.trim(); });
+      if(p.length < 5){ bad++; return; }
+      var amt = num(String(p[4]).replace(/[¥$,\s]/g, ''));
+      if(!(amt > 0)){ bad++; return; }
+      var type = /收入/.test(p[2]) ? '收入' : '支出';
+      list.push({
+        '交易时间': { date: normalizeDateInput(p[0]) || dateTodayStr() },
+        '收支类型': { select: type },
+        '渠道': { select: p[1] || '其他' },
+        '分类': { select: p[3] || (type === '收入' ? '其他收入' : '其他支出') },
+        '金额': { number: amt },
+        '摘要': { text: p[5] || '批量导入' },
+        '备注': { text: p[6] || '' },
+        '数据来源': { select: '手动录入' }
+      });
+    });
+    if(!list.length){ toast('未解析到有效行，请检查格式'); return; }
+    batchAddLedger(list).then(function(){ $('paste-box').value = ''; })
+      .then(function(){ if(bad) toast('另有 ' + bad + ' 行格式不符已跳过'); });
+  };
+
+  $('td-read').onclick = function(){
+    var link = $('td-link').value.trim();
+    if(!link){ toast('请先粘贴腾讯文档链接'); return; }
+    var btn = this; btn.disabled = true; btn.textContent = '读取中…';
+    fetch(link).then(function(res){
+      if(!res.ok) throw new Error('http' + res.status);
+      return res.text();
+    }).then(function(txt){
+      var rows = parseCSV(txt).filter(function(r){ return r.some(function(c){ return c && c.trim(); }); });
+      if(rows.length < 2) throw new Error('no-data');
+      state.csv = { rows: rows };
+      btn.disabled = false; btn.textContent = '读取并生成报表';
+      renderCsvMapping();
+      toast('已读取 ' + (rows.length - 1) + ' 行，请在下方确认列映射');
+    }).catch(function(){
+      btn.disabled = false; btn.textContent = '读取并生成报表';
+      $('import-stage').innerHTML = '<div class="note">浏览器跨域限制，无法直接读取腾讯文档内容。请改用「方式二 · 粘贴表格内容」：在腾讯文档中选中表格区域复制，粘贴到上方文本框，再点「解析并导入」（最稳）。</div>';
+    });
+  };
+
+  $('td-paste-import').onclick = function(){
+    var txt = $('td-paste').value.trim();
+    if(!txt){ toast('请先粘贴表格内容'); return; }
+    var list = parseTdPaste(txt);
+    if(!list.length){ toast('未解析到有效行，请检查格式（表头：日期,渠道,收支类型,分类,金额,摘要）'); return; }
+    state.tdPreview = list;
+    renderTdPreview(list);
+  };
+
+  $('import-stage').onclick = function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b || b.id !== 'td-confirm') return;
+    var list = state.tdPreview || [];
+    if(!list.length) return;
+    b.disabled = true; b.textContent = '导入中…';
+    batchAddLedger(list).then(function(){
+      state.tdPreview = null; $('td-paste').value = '';
+      $('import-stage').innerHTML = '<div class="note">已导入 ' + list.length + ' 笔流水，门店收支报表已刷新。</div>';
+    }).catch(function(){ b.disabled = false; b.textContent = '确认导入'; });
+  };
+
+  $('btn-clear-demo').onclick = function(){
+    var sal = state.salary.filter(function(r){ return String(r['备注'] || '').indexOf('(示例)') !== -1; });
+    var led = state.ledger.filter(function(r){ return r['数据来源'] === '示例数据'; });
+    if(!sal.length && !led.length){ toast('没有示例数据'); return; }
+    if(!confirm('将删除 ' + (sal.length + led.length) + ' 条示例数据（工资 ' + sal.length + ' 条 / 流水 ' + led.length + ' 条），确认继续？')) return;
+    deleteRows('salary', sal).then(function(){ return deleteRows('ledger', led); });
+  };
+  $('btn-clear-all').onclick = function(){
+    if(!state.ledger.length){ toast('流水已为空'); return; }
+    if(!confirm('将删除全部 ' + state.ledger.length + ' 笔门店流水，此操作不可撤销，确认继续？')) return;
+    deleteRows('ledger', state.ledger.slice());
+  };
+
+  $('modal-x').onclick = closeModal;
+  $('modal-cancel').onclick = closeModal;
+  $('modal').onclick = function(e){ if(e.target === this) closeModal(); };
+  $('modal-save').onclick = function(){
+    if(!state.modalSubmit) return;
+    var btn = this;
+    var p = state.modalSubmit();
+    if(!p || !p.then) return;
+    btn.disabled = true; btn.textContent = '保存中…';
+    p.then(function(){
+      closeModal(); toast('已保存');
+      return reloadAll();
+    }).then(refreshAll)
+      .catch(function(){ toast('保存失败，请检查输入'); })
+      .then(function(){ btn.disabled = false; btn.textContent = '保存'; });
+  };
+}
+function parseTdPaste(text){
+  var lines = text.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean);
+  if(!lines.length) return [];
+  var header = lines[0].toLowerCase();
+  var hasHeader = /日期|渠道|收支类型|分类|金额/.test(header);
+  var delim = (lines[0].indexOf('\t') !== -1) ? '\t' : (/，/.test(lines[0]) ? '，' : ',');
+  var start = hasHeader ? 1 : 0;
+  var list = [];
+  for(var i = start; i < lines.length; i++){
+    var p = lines[i].split(delim).map(function(s){ return s.trim(); });
+    if(p.length < 2) continue;
+    var rawAmt = (p[4] !== undefined) ? p[4] : (p[1] || '');
+    var amt = num(String(rawAmt).replace(/[¥$,\s]/g, ''));
+    if(!(amt > 0) && !(amt < 0)) continue;
+    var type = /收入/.test(p[2] || '') ? '收入' : '支出';
+    list.push({
+      '交易时间': { date: normalizeDateInput(p[0]) || dateTodayStr() },
+      '收支类型': { select: type },
+      '渠道': { select: (p[1] || '其他') },
+      '分类': { select: (p[3] || (type === '收入' ? '其他收入' : '其他支出')) },
+      '金额': { number: Math.abs(amt) },
+      '摘要': { text: (p[5] || '粘贴导入') },
+      '备注': { text: (p[6] || '') },
+      '数据来源': { select: '表格导入' }
+    });
+  }
+  return list;
+}
+function renderTdPreview(list){
+  var h = '<div class="muted" style="margin-bottom:8px">已解析 ' + list.length + ' 笔流水，预览前 5 行：</div>';
+  h += '<div class="tbl-wrap"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="color:var(--muted)"><th style="text-align:left;padding:4px 6px">日期</th><th style="text-align:left;padding:4px 6px">收支</th><th style="text-align:left;padding:4px 6px">渠道</th><th style="text-align:left;padding:4px 6px">分类</th><th style="text-align:left;padding:4px 6px">金额</th><th style="text-align:left;padding:4px 6px">摘要</th></tr></thead><tbody>';
+  list.slice(0, 5).forEach(function(r){
+    h += '<tr style="border-top:1px solid var(--border)"><td style="padding:4px 6px">' + (r['交易时间'].date || '') + '</td><td style="padding:4px 6px">' + r['收支类型'].select + '</td><td style="padding:4px 6px">' + r['渠道'].select + '</td><td style="padding:4px 6px">' + r['分类'].select + '</td><td style="padding:4px 6px">' + r['金额'].number + '</td><td style="padding:4px 6px">' + (r['摘要'].text || '') + '</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  h += '<div style="margin-top:12px"><button class="btn btn-sm btn-primary" id="td-confirm" type="button">确认导入 ' + list.length + ' 笔</button></div>';
+  $('import-stage').innerHTML = h;
+}
+function switchTab(tab){
+  state.tab = tab;
+  var tabs = document.querySelector('.tabs');
+  if(tabs) tabs.style.display = 'none'; /* 独立页：始终隐藏主导航 */
+  $('tab-salary').className = 'tab' + (tab === 'salary' ? ' on' : '');
+  $('tab-ledger').className = 'tab' + (tab === 'ledger' ? ' on' : '');
+  $('tab-pending').className = 'tab' + (tab === 'pending' ? ' on' : '');
+  $('tab-approval').className = 'tab' + (tab === 'approval' ? ' on' : '');
+  $('view-salary').className = 'view' + (tab === 'salary' ? ' on' : '');
+  $('view-ledger').className = 'view' + (tab === 'ledger' ? ' on' : '');
+  $('view-pending').className = 'view' + (tab === 'pending' ? ' on' : '');
+  $('view-approval').className = 'view' + (tab === 'approval' ? ' on' : '');
+  $('view-import').className = 'view' + (tab === 'import' ? ' on' : '');
+  $('import-back').hidden = (tab !== 'import');
+  if(tab === 'import'){ renderSources(); }
+  window.scrollTo(0, 0);
+}
+
+/* ============ 初始化 ============ */
+function collectOptions(schema, store){
+  (schema.properties || []).forEach(function(f){
+    if((f.type === 'select' || f.type === 'multi_select') && f.config && f.config.options){
+      store[f.name] = f.config.options;
+    }
+  });
+  return store;
+}
+function loadSchemas(){
+  if(!sdkReady()) return Promise.reject(new Error('no-sdk'));
+  return getSalarySchema()
+    .then(function(schema){ collectOptions(schema, state.salaryOpts); })
+    .then(getLedgerSchema)
+    .then(function(schema){ collectOptions(schema, state.ledgerOpts); });
+}
+function init(){
+  bindEvents();
+  bindDraftInputs();
+  checkWriteReturn();
+  maybeGuestTip();
+  loadSources();
+  loadUsers().then(ensureAdmin).then(loadSession).then(function(){
+    loadApprovals();
+    migrateCleanDemo();
+    try{ state.salaryPwd = localStorage.getItem('wb_dataws_salpwd') || ''; }catch(e){ state.salaryPwd = ''; }
+    renderUser();
+    renderApproval();
+    if(!sdkReady()){
+      state.status = 'offline';
+      renderStatus(); renderPending();
+      return;
+    }
+    state.status = 'loading'; renderStatus();
+    loadSchemas()
+      .then(function(){ renderFormOptions(); restoreDrafts(); if(!$('led-f-date').value) $('led-f-date').value = dateTodayStr(); })
+      .then(reloadAll)
+      .then(function(){ state.status = 'synced'; refreshAll(); })
+      .catch(function(err){
+        console.error('[workspace] 初始化失败', err);
+        state.status = 'offline';
+        renderStatus();
+      });
+  });
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+})();
+</script>
+</body>
+</html>
