@@ -42,18 +42,35 @@
 | POST | `/api/approvals` | 发起报销 | 已登录 |
 | PUT | `/api/approvals/{id}` | 审批操作 | 已登录 |
 
+## 仓库
+
+`https://github.com/g-star1024/data-workspace`（主分支 `main`，已推送）
+
 ## 部署步骤
 
-1. **Cloudflare 控制台** → Workers & Pages → KV → 创建 Namespace，命名 `数据工作台`
-2. **GitHub 新建仓库**（公开/私有均可），clone 本项目并 push
-3. **Cloudflare 控制台** → Workers & Pages → Pages → Connect to Git → 选 GitHub 仓库
-4. 构建设置：
-   - Framework preset: None
-   - Build command: (留空)
-   - Build output directory: `pages`
-5. **Functions → KV Namespaces**：添加绑定，Variable name = `KV`，选刚建的 Namespace
-6. **Variables and Secrets**：添加 `CF_API_TOKEN`（可选，用于 wrangler 操作）
-7. 提交 push 触发自动部署
+> 状态：**代码已推送到 GitHub**，剩余为 Cloudflare 侧配置（必须你在控制台做）。
+
+1. **Cloudflare 控制台** → Workers & Pages → KV → 创建 Namespace，命名 `数据工作台`，记下 Namespace ID
+2. **Cloudflare 控制台** → Workers & Pages → Pages → **Connect to Git** → 授权并选择 `g-star1024/data-workspace`
+3. 构建设置：
+   - Framework preset: **None**
+   - Build command: **留空**
+   - Build output directory: **`pages`**
+4. 部署完成后 → **Settings → Functions → KV Namespaces** → Add binding：
+   - Variable name = **`KV`**
+   - KV namespace = 第 1 步建的 Namespace
+5. 改完绑定后**重新部署一次**（Deployments → Retry deployment），KV 绑定才生效
+
+### ⚠️ 关于 `.github/workflows/deploy.yml`
+
+仓库里已有一条 GitHub Actions 部署工作流（走 `wrangler-action`，依赖 `CF_API_TOKEN` / `CF_ACCOUNT_ID` 两个 Secrets）。
+
+它与「Pages Git 集成」是**两条互相独立的部署通道**，二选一即可：
+
+- **只用 Git 集成（推荐）**：删掉 `deploy.yml`，Cloudflare 自动监听 push 并部署，零配置，不需要任何 Secret
+- **只用 Actions**：保留 `deploy.yml`，并在仓库 Settings → Secrets and variables → Actions 里配置 `CF_API_TOKEN` 和 `CF_ACCOUNT_ID`
+
+两条同时开着会**重复部署两次**，且 Actions 那条在没配 Secret 时每次 push 都会报红叉。
 
 ## 首次使用
 
