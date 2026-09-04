@@ -61,16 +61,13 @@
    - KV namespace = 第 1 步建的 Namespace
 5. 改完绑定后**重新部署一次**（Deployments → Retry deployment），KV 绑定才生效
 
-### ⚠️ 关于 `.github/workflows/deploy.yml`
+### 部署通道：Cloudflare Pages Git 集成
 
-仓库里已有一条 GitHub Actions 部署工作流（走 `wrangler-action`，依赖 `CF_API_TOKEN` / `CF_ACCOUNT_ID` 两个 Secrets）。
+已确定**只走 Git 集成**，不使用 GitHub Actions（`.github/workflows/deploy.yml` 已移除）。
 
-它与「Pages Git 集成」是**两条互相独立的部署通道**，二选一即可：
+原因：Pages 项目的 KV 绑定**必须**在 Cloudflare 控制台手动配置（`functions/api/*.js` 读 `env.KV`，而 Pages 不认 `wrangler.toml` 里的 bindings）。既然这一步绕不开，Actions 的 Secret 配置就是纯冗余，且两条通道并存会导致重复部署。
 
-- **只用 Git 集成（推荐）**：删掉 `deploy.yml`，Cloudflare 自动监听 push 并部署，零配置，不需要任何 Secret
-- **只用 Actions**：保留 `deploy.yml`，并在仓库 Settings → Secrets and variables → Actions 里配置 `CF_API_TOKEN` 和 `CF_ACCOUNT_ID`
-
-两条同时开着会**重复部署两次**，且 Actions 那条在没配 Secret 时每次 push 都会报红叉。
+> ⚠️ **KV 绑定是硬依赖**：没配 `KV` 绑定前，页面能打开，但所有 `/api/*` 会 500。这是部署后第一件要确认的事。
 
 ## 首次使用
 
