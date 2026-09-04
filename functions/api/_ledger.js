@@ -3,13 +3,47 @@ import { uid, body, json, preflight, kvGet, kvPut, requireSession } from './_uti
 
 export async function onRequest(req, env) {
   if (req.method === 'OPTIONS') return preflight();
+  const u = new URL(req.url);
+  const path = u.pathname;
+  const q = u.searchParams;
+
+  // GET /api/ledger/summary — 免登录公开聚合（供数据大屏投屏常驻）
+  // 只返回 KPI 汇总数字（总收入/支出/月度/渠道/分类），绝不返回逐笔明细行，
+  // 明细仍走下方需登录的 /api/ledger。字段名与前端中文业务字段一致。
+  if (req.method === 'GET' && path === '/api/ledger/summary') {
+    const rows = await kvGet(env, 'ledger', []);
+    const a = {
+      income: 0, expense: 0, net: 0, inCnt: 0, outCnt: 0, wx: 0,
+      byChannel: {}, byCategory: {}, byMonth: {},
+    };
+    rows.forEach(r => {
+      const amt = Number(r['金额'] || 0);
+      const isIn = r['收支类型'] === '收入';
+      const mk = String(r['交易时间'] || '').slice(0, 7);
+      if (mk) {
+        if (!a.byMonth[mk]) a.byMonth[mk] = { month: mk, income: 0, expense: 0, inCnt: 0, outCnt: 0 };
+        if (isIn) { a.byMonth[mk].income += amt; a.byMonth[mk].inCnt++; }
+        else { a.byMonth[mk].expense += amt; a.byMonth[mk].outCnt++; }
+      }
+      if (isIn) {
+        a.income += amt; a.inCnt++;
+        const ch = r['渠道'] || '其他';
+        a.byChannel[ch] = (a.byChannel[ch] || 0) + amt;
+        if (ch === '微信') a.wx += amt;
+      } else {
+        a.expense += amt; a.outCnt++;
+        const ct = r['分类'] || '其他支出';
+        a.byCategory[ct] = (a.byCategory[ct] || 0) + amt;
+      }
+    });
+    a.net = a.income - a.expense;
+    return json({ ok: true, data: a });
+  }
+
   let sess;
   try { sess = await requireSession(req, env); } catch (e) {
     return json({ ok: false, msg: '未登录' }, 401);
   }
-  const u = new URL(req.url);
-  const path = u.pathname;
-  const q = u.searchParams;
 
   // GET /api/ledger
   if (req.method === 'GET' && path === '/api/ledger') {

@@ -127,7 +127,7 @@ body{
       <div class="body" id="led-catbar"></div>
     </div>
   </div>
-  <div class="status-line" id="status-line">正在连接资料库…</div>
+  <div class="status-line" id="status-line">正在加载经营数据…</div>
 </div>
 
 <script>
@@ -157,11 +157,13 @@ function apiCall(path){
   var t = getToken();
   var h = { 'Content-Type': 'application/json' };
   if(t) h['Authorization'] = 'Bearer ' + t;
-  return fetch(path, { headers: h }).then(function(r){ return r.json(); }).catch(function(){ return { httpOk: false }; });
+  return fetch(path, { headers: h }).then(function(r){ return r.json(); }).catch(function(){ return { ok: false }; });
 }
 function loadData(){
-  return apiCall('/api/ledger').then(function(resp){
-    return { ledger: resp.httpOk ? (resp.data || []) : [] };
+  // 大屏走免登录的聚合端点：服务端只返回 KPI 汇总数字（收入/支出/月度/渠道/分类），
+  // 不返回逐笔流水明细，投屏常驻无需登录；明细数据仍在业务页受登录保护。
+  return apiCall('/api/ledger/summary').then(function(resp){
+    return { agg: (resp && resp.ok && resp.data) ? resp.data : null };
   });
 }
 
@@ -290,7 +292,9 @@ function kpiCard(lab,val,sub,color,glow){
     '<div class="lab">'+lab+'</div><div class="val">'+val+'</div><div class="sub">'+(sub||'')+'</div></div>';
 }
 function render(d){
-  var la=aggLedger(d.ledger);
+  // 聚合已由服务端 /api/ledger/summary 算好（免登录，无明细行）；空数据时给零值兜底
+  var emptyAgg = {income:0,expense:0,net:0,inCnt:0,outCnt:0,wx:0,byChannel:{},byCategory:{},byMonth:{}};
+  var la = d.agg || emptyAgg;
   var wxRate = la.income>0 ? Math.round(la.wx/la.income*100) : 0;
   var tm = (new Date()).toISOString().slice(0,7);
   var now = new Date();
@@ -338,7 +342,7 @@ function render(d){
   document.getElementById('led-catbar').innerHTML = catBarHTML(cats);
 
   document.getElementById('status-line').textContent =
-    '已同步 · 门店流水 '+d.ledger.length+' 条 · 数据来自资料库（仅经营收支，不含工资）';
+    '已同步 · 门店流水 '+totalCnt+' 条 · 经营数据汇总（仅收支，不含工资；明细需登录查看）';
 }
 
 /* ===== 时钟 ===== */
@@ -368,7 +372,7 @@ document.addEventListener('fullscreenchange',function(){
 
 /* 启动 */
 loadData().then(render).catch(function(){
-  document.getElementById('status-line').textContent = '资料库未连接（请在已发布的页面中打开，或检查数据表绑定）';
+  document.getElementById('status-line').textContent = '数据加载失败，请检查网络后刷新页面';
   document.getElementById('kpis').innerHTML='';
   ['led-trend','led-pie','led-net','led-catbar'].forEach(function(id){
     document.getElementById(id).innerHTML='<div class="empty">暂无数据 / 离线</div>';
