@@ -370,7 +370,10 @@ document.addEventListener('fullscreenchange',function(){
   document.getElementById('fs-label').textContent = document.fullscreenElement ? '退出全屏' : '全屏';
 });
 
-/* 启动 */
+/* 启动：首次加载 + 每 60 秒静默刷新（投屏常驻，新流水自动更新，无需刷新页面） */
+function refresh(){
+  loadData().then(render).catch(function(){ /* 轮询失败静默忽略，下次重试 */ });
+}
 loadData().then(render).catch(function(){
   document.getElementById('status-line').textContent = '数据加载失败，请检查网络后刷新页面';
   document.getElementById('kpis').innerHTML='';
@@ -378,6 +381,7 @@ loadData().then(render).catch(function(){
     document.getElementById(id).innerHTML='<div class="empty">暂无数据 / 离线</div>';
   });
 });
+setInterval(refresh, 60000);
 </script>
 </body>
 </html>

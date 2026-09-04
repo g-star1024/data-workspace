@@ -1,5 +1,5 @@
 // ============ /api/auth — 登录 / 会话 / 注册关闭 ============
-import { sha256, token, body, json, preflight, kvGet, requireSession } from './_utils.js';
+import { sha256, token, body, json, preflight, kvGet, kvPut, requireSession } from './_utils.js';
 
 export async function onRequest(req, env) {
   if (req.method === 'OPTIONS') return preflight();
@@ -35,6 +35,30 @@ export async function onRequest(req, env) {
     }
     const { password_hash, salt, ...safe } = sess.user;
     return json({ ok: true, user: safe });
+  }
+
+  // POST /api/auth/change-password — 用户修改自己的登录密码（需登录，验证原密码）
+  if (req.method === 'POST' && path === '/api/auth/change-password') {
+    let sess;
+    try { sess = await requireSession(req, env); } catch (e) {
+      return json({ ok: false, msg: '未登录' }, 401);
+    }
+    const { oldPassword, newPassword } = await body(req);
+    if (!newPassword || String(newPassword).length < 4) {
+      return json({ ok: false, msg: '新密码至少 4 位' }, 400);
+    }
+    const users = await kvGet(env, 'users', []);
+    const me = users.find(u => u.id === sess.user.id);
+    if (!me) return json({ ok: false, msg: '用户不存在' }, 404);
+    const oldHash = await sha256(String(oldPassword || '') + me.salt);
+    if (oldHash !== me.password_hash) {
+      return json({ ok: false, msg: '原密码错误' }, 400);
+    }
+    const newSalt = Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 8);
+    me.salt = newSalt;
+    me.password_hash = await sha256(String(newPassword) + newSalt);
+    await kvPut(env, 'users', users);
+    return json({ ok: true, msg: '密码已修改' });
   }
 
   // POST /api/auth/logout

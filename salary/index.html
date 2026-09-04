@@ -4,7 +4,7 @@
 <meta charset="utf-8" data-page-node-id="aBrGykgQZwDpzPFwpoXCQf">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="K3ahr3a7Fg4LP0O9qVesGj">
 <!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
-<title>鼎知堂 · 门店收支</title>
+<title>工资台账 · 数据分析工作台</title>
 <script>
 (function(){
   try{
@@ -442,7 +442,7 @@ body.in-subpage .tabs{display:none}
 <div class="wrap" data-page-node-id="7l29uEqmtjaI0RtGThS2gr">
 
   <div class="hdr" data-page-node-id="VKnNI3rSrZqzDtHKzh5A8f">
-    <h1 data-page-node-id="1PMM5HCi1j7oHgKWvUZryP"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4v7H4z"/><path d="M10 6h4v14h-4z"/><path d="M16 10h4v10h-4z"/><path d="M3 20h18"/></svg></span>鼎知堂<span class="sub" data-page-node-id="SyJrlCGd6d0WJhkcQmyTKb">门店收支流水 · 录入与可视化（独立页）</span></h1>
+    <h1 data-page-node-id="1PMM5HCi1j7oHgKWvUZryP"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4v7H4z"/><path d="M10 6h4v14h-4z"/><path d="M16 10h4v10h-4z"/><path d="M3 20h18"/></svg></span>工资台账<span class="sub" data-page-node-id="SyJrlCGd6d0WJhkcQmyTKb">工资记录 · 录入与可视化（独立页）</span></h1>
     <div class="tools" data-page-node-id="vxl0gBOIqZ36C0a7SbXRFQ">
       <span class="status" id="status" data-page-node-id="uv8YqxKu611PlHhYPq8zia"><i class="dot loading" id="status-dot" data-page-node-id="AIkOddCoUzstMv6JPoZXUU"></i><span id="status-text" data-page-node-id="UAQw0HcF1U3cr8iLqNC3YI">加载中</span></span>
       <button class="btn btn-sm" id="btn-user" type="button" data-page-node-id="userBtn01"></button>
@@ -467,7 +467,7 @@ body.in-subpage .tabs{display:none}
   </div>
 
   <!-- ================= 工资管理 ================= -->
-  <div class="view" id="view-salary" data-page-node-id="ExGoQiSGPLF180jfWVR2Z0">
+  <div class="view on" id="view-salary" data-page-node-id="ExGoQiSGPLF180jfWVR2Z0">
 
     <div class="lock-banner" id="sal-lock-banner" data-page-node-id="salLockBanner01">
       <div class="lb-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3 M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z M12 15v2"/></svg></div>
@@ -551,7 +551,7 @@ body.in-subpage .tabs{display:none}
   </div>
 
   <!-- ================= 鼎知堂（门店收支） ================= -->
-  <div class="view on" id="view-ledger" data-page-node-id="F14Ttio6YPUi4VjmN5mQhO">
+  <div class="view" id="view-ledger" data-page-node-id="F14Ttio6YPUi4VjmN5mQhO">
 
     <div class="kpis" data-page-node-id="1vFUX9831MZR1Wo2dTEH9i">
       <div class="kpi" data-page-node-id="J0jx8zyN536zsGCC1JlD8t"><div class="k" data-page-node-id="HQbzYA98XVowCMkPUuuQbG">总收入</div><div class="v pos" id="led-kpi-in" data-sp-bindable="database" data-sp-database-id="VhotoVgDEpeywLkYTiKoeW" data-page-node-id="8KWsiEyN1hLHSuTlb07jx2">¥0.00</div></div>
@@ -841,7 +841,7 @@ var ICONS = {
 };
 
 var state = {
-  tab: 'ledger',
+  tab: 'salary',
   status: 'loading',
   salary: [],
   ledger: [],
@@ -2406,6 +2406,30 @@ function logoutUser(){
   // 整页重载：清掉登录态下加载的工资/流水/审批数据，回到访客模式
   setTimeout(function(){ location.reload(); }, 300);
 }
+/* 修改自己的登录密码：验证原密码 → 设置新密码（≥4位），需重新登录 */
+function changeMyPassword(){
+  var oldPwd = window.prompt('请输入当前密码（原密码）：');
+  if(oldPwd === null) return;
+  var newPwd = window.prompt('请设置新密码（至少 4 位）：');
+  if(newPwd === null) return;
+  if(!newPwd || newPwd.length < 4){ toast('新密码至少 4 位'); return; }
+  if(newPwd === oldPwd){ toast('新密码不能与原密码相同'); return; }
+  var again = window.prompt('请再次输入新密码确认：');
+  if(again === null) return;
+  if(again !== newPwd){ toast('两次输入的新密码不一致'); return; }
+  apiCall('/api/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({ oldPassword: oldPwd, newPassword: newPwd })
+  }).then(function(r){
+    if(r.httpOk){
+      toast('密码已修改，请用新密码重新登录');
+      setToken(''); state.currentUser = null;
+      setTimeout(function(){ location.reload(); }, 800);
+    } else {
+      toast((r.body && r.body.msg) || ('修改失败 HTTP ' + r.status));
+    }
+  }).catch(function(){ toast('网络异常，请稍后重试'); });
+}
 function renderUser(){
   var b = $('btn-user');
   if(!b) return;
@@ -2792,7 +2816,7 @@ function bindEvents(){
   $('btn-settings').onclick = openSettings;
   var abx = $('auth-banner-x');
   if(abx) abx.onclick = function(){ $('auth-banner').hidden = true; };
-  $('import-back').onclick = function(){ switchTab('ledger'); };
+  $('import-back').onclick = function(){ switchTab('salary'); };
   $('add-tencent-btn').onclick = function(){
     addSource('tencent', $('add-tencent-name').value, $('add-tencent-url').value);
     $('add-tencent-name').value = ''; $('add-tencent-url').value = '';
@@ -2813,7 +2837,12 @@ function bindEvents(){
   /* 账号体系 */
   $('btn-user').onclick = function(){
     if(isLoggedIn()){
-      if(confirm('确定退出登录账号「' + currentUserName() + '」？')) logoutUser();
+      // 确定=退出登录；取消=修改我的登录密码
+      if(confirm('账号「' + currentUserName() + '」\n\n确定 = 退出登录\n取消 = 修改登录密码')){
+        logoutUser();
+      }else{
+        changeMyPassword();
+      }
     }else{
       openAuthModal();
     }

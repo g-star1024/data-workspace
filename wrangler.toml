@@ -1,6 +1,8 @@
 # 注意：name 只允许小写字母/数字/连字符，中文会导致构建直接失败
 name = "data-workspace"
-pages_build_output_dir = "pages"
+# 经典 Pages 布局：静态文件（index.html 及各模块目录）与 functions/ 同在仓库根，
+# 输出目录即仓库根。functions/ 会被 Pages 自动识别为后端（不会作为静态资源对外）。
+pages_build_output_dir = "./"
 compatibility_date = "2026-05-01"
 
 [vars]
