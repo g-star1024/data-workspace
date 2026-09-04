@@ -13,8 +13,9 @@ export async function onRequest(req, env) {
 
   // GET /api/ledger
   if (req.method === 'GET' && path === '/api/ledger') {
+    // 字段名必须与前端一致（中文业务字段），按交易时间降序
     let rows = await kvGet(env, 'ledger', []);
-    rows.sort((a, b) => String(b.transactionTime || b.date || '').localeCompare(String(a.transactionTime || a.date || '')));
+    rows.sort((a, b) => String(b['交易时间'] || '').localeCompare(String(a['交易时间'] || '')));
     return json({ ok: true, data: rows });
   }
 
@@ -23,14 +24,16 @@ export async function onRequest(req, env) {
     const rows = await kvGet(env, 'ledger', []);
     const out = {};
     rows.forEach(r => {
-      const key = String(r.month || r.transactionTime || '').slice(0, 7);
+      // 前端字段：交易时间 / 收支类型 / 金额
+      const key = String(r['交易时间'] || '').slice(0, 7);
       if (!out[key]) out[key] = { month: key, income: 0, expense: 0, incomeCount: 0, expenseCount: 0 };
-      const amt = Number(r.amount || 0);
-      const t = r.type || r.ioType || '';
+      const amt = Number(r['金额'] || 0);
+      const t = r['收支类型'] || '';
       if (t === '收入') { out[key].income += amt; out[key].incomeCount++; }
-      else { out[key].expense += amt; out[key].expenseCount++; }
+      else if (t === '支出') { out[key].expense += amt; out[key].expenseCount++; }
     });
-    return json({ ok: true, data: Object.values(out) });
+    const data = Object.values(out).sort((a, b) => String(b.month).localeCompare(String(a.month)));
+    return json({ ok: true, data });
   }
 
   // POST /api/ledger

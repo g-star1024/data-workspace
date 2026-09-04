@@ -1,6 +1,11 @@
-name = "数据工作台"
+# 注意：name 只允许小写字母/数字/连字符，中文会导致构建直接失败
+name = "data-workspace"
 pages_build_output_dir = "pages"
 compatibility_date = "2026-05-01"
 
 [vars]
 ENV = "production"
+
+# Pages 项目的 KV 绑定需在 Cloudflare 控制台配置：
+# Settings → Functions → KV Namespaces → Variable name = KV
+# 本地调试：wrangler pages dev pages --kv KV

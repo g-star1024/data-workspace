@@ -2484,14 +2484,20 @@ function openAdminPanel(){
 /* ============ 审批体系（报销留痕） ============ */
 var APPROVAL_KEY = 'wb_dataws_approvals';
 function loadApprovals(){
-  try{
-    var raw = localStorage.getItem(APPROVAL_KEY);
-    state.approvals = raw ? JSON.parse(raw) : [];
-  }catch(e){ state.approvals = []; }
-  if(!Array.isArray(state.approvals)) state.approvals = [];
+  /* 审批单存于 Cloudflare KV（多端实时共享）；未登录时不可读，保持空列表 */
+  if(!isLoggedIn()){ state.approvals = []; return Promise.resolve(state.approvals); }
+  return apiCall('/api/approvals').then(function(r){
+    state.approvals = (r.httpOk && r.body && Array.isArray(r.body.data)) ? normArr(r.body.data) : [];
+    return state.approvals;
+  });
 }
 function saveApprovals(){
-  try{ localStorage.setItem(APPROVAL_KEY, JSON.stringify(state.approvals)); }catch(e){}
+  /* 整表保存：前端 chain/level 模型原样持久化到 KV，服务端不做模型转换 */
+  if(!isLoggedIn()) return;
+  apiCall('/api/approvals', { method: 'POST', body: JSON.stringify(state.approvals) })
+    .then(function(r){
+      if(!r.httpOk) toast('审批数据保存失败：' + ((r.body && r.body.msg) || ('HTTP ' + r.status)));
+    });
 }
 function apNowStr(){
   var d = new Date(), p = function(x){ return (x < 10 ? '0' : '') + x; };
@@ -3249,8 +3255,7 @@ function init(){
   checkWriteReturn();
   maybeGuestTip();
   loadSources();
-  loadUsers().then(ensureAdmin).then(loadSession).then(function(){
-    loadApprovals();
+  loadUsers().then(ensureAdmin).then(loadSession).then(loadApprovals).then(function(){
     migrateCleanDemo();
     try{ state.salaryPwd = localStorage.getItem('wb_dataws_salpwd') || ''; }catch(e){ state.salaryPwd = ''; }
     renderUser();

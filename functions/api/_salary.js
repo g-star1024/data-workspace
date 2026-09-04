@@ -14,8 +14,8 @@ export async function onRequest(req, env) {
   // GET /api/salary — 列表
   if (req.method === 'GET' && path === '/api/salary') {
     const rows = await kvGet(env, 'salary', []);
-    // 按月降序
-    rows.sort((a, b) => String(b.month || '').localeCompare(String(a.month || '')));
+    // 字段名必须与前端一致（中文业务字段），按月降序
+    rows.sort((a, b) => String(b['月份'] || '').localeCompare(String(a['月份'] || '')));
     return json({ ok: true, data: rows });
   }
 

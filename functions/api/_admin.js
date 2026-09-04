@@ -1,5 +1,5 @@
 // ============ /api/admin — 用户管理（仅管理员） ============
-import { sha256, uid, token, body, json, preflight, kvGet, kvPut, requireAdmin } from './_utils.js';
+import { sha256, uid, token, body, json, preflight, kvGet, kvPut, requireSession, requireAdmin } from './_utils.js';
 
 function salt6() {
   return Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 8);
@@ -29,16 +29,23 @@ export async function onRequest(req, env) {
     return json({ ok: true, user: { id: admin.id, name: admin.name, roles: admin.roles, admin: true } });
   }
 
-  let sess;
-  try { sess = await requireAdmin(req, env); } catch (e) {
-    return json({ ok: false, msg: '无管理员权限' }, 403);
-  }
-
-  // GET /api/admin/users
+  // GET /api/admin/users — 只读名单，任何已登录用户可读
+  // 原因：发起人提交报销时需要拉取「审批人」名单，若限管理员则普通用户无法发起报销。
+  // 响应已剔除 password_hash / salt，不泄露凭据。写操作（POST/PUT/DELETE）仍限管理员。
   if (req.method === 'GET' && path === '/api/admin/users') {
+    let sess;
+    try { sess = await requireSession(req, env); } catch (e) {
+      return json({ ok: false, msg: '未登录' }, 401);
+    }
     const users = await kvGet(env, 'users', []);
     const safe = users.map(u => { const { password_hash, salt, ...r } = u; r.admin = (r.roles || []).includes('admin'); return r; });
     return json({ ok: true, users: safe });
+  }
+
+  // 以下写操作一律要求管理员
+  let sess;
+  try { sess = await requireAdmin(req, env); } catch (e) {
+    return json({ ok: false, msg: '无管理员权限' }, 403);
   }
 
   // POST /api/admin/users

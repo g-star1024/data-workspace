@@ -3,6 +3,7 @@
 .env
 .env.local
 wrangler.json
+.wrangler/
 
 # Node
 node_modules/
