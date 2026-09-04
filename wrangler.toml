@@ -6,6 +6,12 @@ compatibility_date = "2026-05-01"
 [vars]
 ENV = "production"
 
-# Pages 项目的 KV 绑定需在 Cloudflare 控制台配置：
-# Settings → Functions → KV Namespaces → Variable name = KV
+# KV 绑定（Pages Git 集成模式下由本文件统一管理，push 后自动生效）
+# id 填 Cloudflare 控制台 KV namespace 的 ID：
+#   Workers & Pages → KV → 选中（或新建）一个 namespace → 复制其 ID
+# 代码里通过 env.KV 访问，binding 名必须是 KV
+[[kv_namespaces]]
+binding = "KV"
+id = "f72669c5031f425697e04de70755aef0"
+
 # 本地调试：wrangler pages dev pages --kv KV
