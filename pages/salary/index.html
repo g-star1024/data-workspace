@@ -2314,10 +2314,13 @@ var ROLE_APPROVER = '审批人';
 function currentUserName(){ return state.currentUser ? state.currentUser.name : ''; }
 function isLoggedIn(){ return !!state.currentUser; }
 function isAdmin(){ return !!(state.currentUser && state.currentUser.admin); }
+/* 后端 roles 存英文标识，前端判断与展示用中文角色名，这里统一映射 */
+var ROLE_MAP = { initiator: ROLE_APPLICANT, approver: ROLE_APPROVER, admin: ROLE_APPLICANT };
 function userRoles(u){
   if(!u) return [];
   if(u.admin) return [ROLE_APPLICANT, ROLE_APPROVER];
-  return Array.isArray(u.roles) ? u.roles : [];
+  if(!Array.isArray(u.roles)) return [];
+  return u.roles.map(function(r){ return ROLE_MAP[r] || r; });
 }
 function hasRole(u, role){ return u && (u.admin || userRoles(u).indexOf(role) !== -1); }
 function canApply(){ return hasRole(state.currentUser, ROLE_APPLICANT); }
@@ -2342,9 +2345,11 @@ function loginUser(name, pwd){
     .then(function(r){
       if(!r.httpOk){ toast(r.body.msg || '登录失败'); return false; }
       setToken(r.body.token);
-      state.currentUser = r.body.user;
-      renderUser(); renderApproval();
+      // 整页重载：初始化链（loadUsers→loadSession→loadApprovals→reloadAll）会带 token 重跑，
+      // 一次性拉到审批人名单、审批单、工资流水等所有依赖登录态的数据；
+      // 否则未登录时这些请求 401 返回空，登录后不刷新就看不到数据/审批人下拉。
       toast('已登录：' + name + (r.body.user.admin ? '（管理员）' : ''));
+      setTimeout(function(){ location.reload(); }, 300);
       return true;
     }).catch(function(e){ toast('网络异常，请检查连接'); return false; });
 }
@@ -2397,8 +2402,9 @@ function adminDeleteUser(uid){
 }
 function logoutUser(){
   state.currentUser = null; setToken('');
-  renderUser(); renderApproval();
   toast('已退出登录');
+  // 整页重载：清掉登录态下加载的工资/流水/审批数据，回到访客模式
+  setTimeout(function(){ location.reload(); }, 300);
 }
 function renderUser(){
   var b = $('btn-user');
