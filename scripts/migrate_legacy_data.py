@@ -19,11 +19,16 @@ import urllib.request
 import urllib.error
 
 
-def call(base, method, path, token=None, payload=None):
+def call_once(base, method, path, token=None, payload=None):
     url = base.rstrip("/") + path
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(url, data=data, method=method)
     req.add_header("Content-Type", "application/json")
+    # Cloudflare 边缘 WAF 会拦截 Python-urllib 默认 UA，必须伪装成浏览器
+    req.add_header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                                 "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                 "Chrome/126.0.0.0 Safari/537.36")
+    req.add_header("Accept", "application/json")
     if token:
         req.add_header("Authorization", "Bearer " + token)
     try:
@@ -36,6 +41,21 @@ def call(base, method, path, token=None, payload=None):
             return e.code, {}
     except Exception as e:
         return 0, {"_error": str(e)}
+
+
+def call(base, method, path, token=None, payload=None, retries=4):
+    # 高频写 KV 时偶发网络超时 / 边缘 429/5xx，自动退避重试，避免单条失败拖垮整批
+    import time
+    last = (0, {})
+    for i in range(retries):
+        st, resp = call_once(base, method, path, token=token, payload=payload)
+        last = (st, resp)
+        # 明确的业务响应（2xx / 4xx 且带 ok/msg）不重试；网络错误(0) 与 429/5xx 才重试
+        if st == 0 or st == 429 or st >= 500:
+            time.sleep(1.5 * (i + 1))
+            continue
+        return st, resp
+    return last
 
 
 def load_records(path):
@@ -134,7 +154,7 @@ def main():
         if st == 200 and resp.get("ok"):
             ok_s += 1
         else:
-            print("  工资写入失败：%s -> %s" % salary_key(r), resp)
+            print("  工资写入失败：%s -> %s" % (salary_key(r), resp))
 
     # 5. 校验
     _, fin_led = call(args.base, "GET", "/api/ledger", token=token)
