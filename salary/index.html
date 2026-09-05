@@ -1004,7 +1004,7 @@ function loadSalaryData(){
 function loadLedgerData(){
   return paginate(queryLedgerFirst, queryLedgerNext).then(function(rows){ state.ledger = rows; });
 }
-function reloadAll(){ return loadSalaryData().then(loadLedgerData); }
+function reloadAll(){ return loadSalaryData().then(loadLedgerData).then(function(){ deriveOptionsFromData(); }); }
 
 /* ============ 计算层 ============ */
 function salaryRowsSorted(){
@@ -1801,6 +1801,7 @@ function refreshAll(){
   renderSalaryFloat();
   renderSalaryTable();
   renderSalaryCharts();
+  renderFormOptions();
   renderLedgerControls();
   renderLedgerTableControls();
   renderLedgerKPI();
@@ -3269,6 +3270,38 @@ function switchTab(tab){
 }
 
 /* ============ 初始化 ============ */
+function deriveOptionsFromData(){
+  // Cloudflare 版无资料库 schema 接口，选项字典改为「内置默认 + 实际数据动态汇总」。
+  // 默认项与 CHANNEL_COLOR / CAT_TYPE / deriveStatus 保持一致，再并入数据中出现过的取值去重。
+  function scalar(v){
+    if(v && typeof v === 'object' && !Array.isArray(v)){
+      if(typeof v.select === 'string') return v.select;
+      if(v.number !== undefined && v.number !== null) return String(v.number);
+      if(typeof v.text === 'string') return v.text;
+      if(v.date !== undefined && v.date !== null) return String(v.date);
+      return '';
+    }
+    return (v === undefined || v === null) ? '' : String(v);
+  }
+  function merge(defRows, rows, field){
+    var set = {};
+    defRows.forEach(function(t){ set[t] = 1; });
+    (rows || []).forEach(function(r){
+      var t = scalar(r[field]);
+      if(t) set[t] = 1;
+    });
+    return Object.keys(set).map(function(t){ return { text: t }; });
+  }
+  state.ledgerOpts = {
+    '收支类型': merge(['收入','支出'], state.ledger, '收支类型'),
+    '渠道': merge(Object.keys(CHANNEL_COLOR), state.ledger, '渠道'),
+    '分类': merge(Object.keys(CAT_TYPE), state.ledger, '分类'),
+    '数据来源': merge(['手动录入','表格导入','截图识别'], state.ledger, '数据来源')
+  };
+  state.salaryOpts = {
+    '发放状态': merge(['未发放','部分发放','已结清'], state.salary, '发放状态')
+  };
+}
 function collectOptions(schema, store){
   (schema.properties || []).forEach(function(f){
     if((f.type === 'select' || f.type === 'multi_select') && f.config && f.config.options){

@@ -76,6 +76,39 @@ async function kvPut(env, key, val) {
   await env.KV.put(key, JSON.stringify(val));
 }
 
+/**
+ * 拆「资料库 SDK 字段包装」→ 标量值。
+ * 旧资料库写入时字段形如 {select:'微信'} / {number:100} / {text:'摘要'} / {date:'2026-09-05'}；
+ * 迁移到 Cloudflare 后前端表格/聚合按扁平标量读取，这里统一拍平。
+ * 标量、数组、未知对象原样返回，兼容历史扁平数据与审批 chain 等结构。
+ */
+function flattenValue(v) {
+  if (v === null || v === undefined) return v;
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'object') {
+    if (typeof v.select === 'string') return v.select;
+    if (v.number !== undefined && v.number !== null) return v.number;
+    if (typeof v.text === 'string') return v.text;
+    if (v.date !== undefined && v.date !== null) return v.date;
+    if (typeof v.value === 'string' || typeof v.value === 'number') return v.value;
+    return v;
+  }
+  return v;
+}
+
+// 系统/结构字段不参与拍平（审批 chain、记录元数据等）
+const FLATTEN_SKIP = new Set(['id', '_id', 'createdAt', 'updatedAt', 'createdBy', 'chain', 'level', 'status', 'approvers', 'approvals']);
+
+/** 拍平整条记录的业务字段（系统字段原样保留） */
+function flattenRecord(rec) {
+  if (!rec || typeof rec !== 'object' || Array.isArray(rec)) return rec;
+  const out = {};
+  for (const k of Object.keys(rec)) {
+    out[k] = FLATTEN_SKIP.has(k) ? rec[k] : flattenValue(rec[k]);
+  }
+  return out;
+}
+
 /** 校验当前会话，返回 {userId, user} 或抛 401 */
 async function requireSession(req, env) {
   const t = bearer(req);
@@ -99,4 +132,4 @@ async function requireAdmin(req, env) {
   return sess;
 }
 
-export { sha256, uid, token, bearer, qs, body, json, preflight, kvGet, kvPut, requireSession, requireAdmin };
+export { sha256, uid, token, bearer, qs, body, json, preflight, kvGet, kvPut, requireSession, requireAdmin, flattenValue, flattenRecord };
