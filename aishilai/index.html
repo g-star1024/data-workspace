@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>艾诗莱美 · 数据分析</title>
+<style>
+:root{
+  --bg:#F4F6FB;
+  --surface:#FFFFFF;
+  --border:#E8ECF4;
+  --text:#0F172A;
+  --text-2:#475569;
+  --text-3:#94A3B8;
+  --brand:#4F46E5;
+  --brand-2:#6366F1;
+  --income:#059669;
+  --expense:#E11D48;
+  --warn:#D97706;
+  --cyan:#0891B2;
+  --r-card:24px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04),0 3px 10px rgba(15,23,42,.05);
+  --shadow:0 10px 30px rgba(15,23,42,.08),0 2px 8px rgba(15,23,42,.05);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 620px at 4% -12%, #EAEEFF 0%, rgba(234,238,255,0) 52%),
+    radial-gradient(1000px 560px at 104% -8%, #E7FAF1 0%, rgba(231,250,241,0) 50%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  min-height:100vh;
+}
+.wrap{width:100%;max-width:1400px;margin:0 auto;padding:clamp(20px,2.5vw,40px) clamp(16px,3vw,44px) clamp(40px,5vw,72px)}
+/* 页头 */
+.head{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 10px 24px rgba(79,70,229,.32);flex:none}
+.logo svg{width:28px;height:28px;color:#fff}
+.head h1{margin:0;font-size:clamp(20px,2.2vw,26px);font-weight:800;letter-spacing:.5px}
+.head .sub{margin-top:4px;color:var(--text-3);font-size:13px;letter-spacing:1px}
+.head .sp{flex:1}
+.month-sel{display:flex;align-items:center;gap:10px}
+.month-sel label{font-size:14px;color:var(--text-2)}
+.month-sel select{
+  padding:10px 16px;border:1px solid var(--border);border-radius:12px;
+  background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;
+  box-shadow:var(--shadow-sm);transition:.2s;
+}
+.month-sel select:hover{border-color:var(--brand)}
+/* Tab 导航 */
+.tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{
+  padding:12px 20px;font-size:14px;font-weight:600;color:var(--text-2);
+  cursor:pointer;border:none;background:none;position:relative;transition:.2s;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab:hover{color:var(--brand)}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+/* 面板 */
+.panel{display:none}
+.panel.active{display:block}
+/* KPI 卡片 */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.kpi{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;
+  background:linear-gradient(90deg,transparent,var(--kc,var(--brand)),transparent)}
+.kpi .lab{font-size:13px;color:var(--text-2);letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.kpi .val{font-size:clamp(22px,2.2vw,30px);font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums;
+  color:var(--kc,var(--text))}
+.kpi .sub{font-size:12px;color:var(--text-3);margin-top:4px}
+.kpi .delta{font-size:12px;margin-top:4px}
+.kpi .delta.up{color:var(--income)}
+.kpi .delta.down{color:var(--expense)}
+/* 图表容器 */
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-bottom:24px}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:24px;box-shadow:var(--shadow-sm);
+}
+.chart-card h3{margin:0 0 16px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.chart-card h3::before{content:"";width:4px;height:18px;border-radius:2px;
+  background:linear-gradient(var(--brand),var(--brand-2));display:inline-block}
+.chart-body{width:100%;min-height:280px;position:relative}
+.chart-body svg{display:block;width:100%;height:auto}
+/* 报告面板 */
+.report-header{
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  color:#fff;border-radius:var(--r-card);padding:32px;margin-bottom:24px;
+}
+.report-header h2{margin:0 0 8px;font-size:24px;font-weight:800}
+.report-header p{margin:0;opacity:.9;font-size:14px;line-height:1.6}
+.report-section{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:24px;margin-bottom:20px;box-shadow:var(--shadow-sm);
+}
+.report-section h3{margin:0 0 16px;font-size:18px;font-weight:700;color:var(--brand)}
+.report-section p{margin:0 0 12px;line-height:1.8;color:var(--text-2)}
+.report-section ul{margin:0;padding-left:20px}
+.report-section li{margin:8px 0;line-height:1.7;color:var(--text-2)}
+.highlight{color:var(--brand);font-weight:700}
+.highlight-up{color:var(--income);font-weight:700}
+.highlight-down{color:var(--expense);font-weight:700}
+/* 按钮 */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;
+  cursor:pointer;border:none;transition:.2s;
+}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.3)}
+.btn-primary:hover{background:var(--brand-2);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-2)}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+/* 加载状态 */
+.loading{text-align:center;padding:60px 20px;color:var(--text-3)}
+.loading::after{content:"";display:inline-block;width:20px;height:20px;margin-left:10px;
+  border:2px solid var(--border);border-top-color:var(--brand);border-radius:50%;
+  animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* 空状态 */
+.empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty svg{width:64px;height:64px;color:var(--border);margin-bottom:16px}
+/* 响应式 */
+@media (max-width:768px){
+  .chart-grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .head{flex-direction:column;align-items:flex-start}
+  .month-sel{width:100%;justify-content:space-between}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <span class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>
+      </svg>
+    </span>
+    <div>
+      <h1>艾诗莱美 · 数据分析</h1>
+      <div class="sub">推广效果 · 流量分析 · 月度报告</div>
+    </div>
+    <div class="sp"></div>
+    <div class="month-sel">
+      <label>选择月份：</label>
+      <select id="monthSelect">
+        <option value="all">全部月份</option>
+        <option value="2026-01">2026年1月</option>
+        <option value="2026-02">2026年2月</option>
+        <option value="2026-03">2026年3月</option>
+        <option value="2026-04">2026年4月</option>
+        <option value="2026-05">2026年5月</option>
+        <option value="2026-06">2026年6月</option>
+        <option value="2026-07">2026年7月</option>
+        <option value="2026-08">2026年8月</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="overview">月度总览</button>
+    <button class="tab" data-panel="promotion">推广效果</button>
+    <button class="tab" data-panel="report">月度报告</button>
+  </div>
+
+  <!-- 月度总览 -->
+  <div class="panel active" id="panel-overview">
+    <div class="kpis" id="kpiCards">
+      <div class="loading">正在加载数据</div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>推广花费趋势</h3>
+        <div class="chart-body" id="chartCost"></div>
+      </div>
+      <div class="chart-card">
+        <h3>流量指标趋势</h3>
+        <div class="chart-body" id="chartTraffic"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 推广效果 -->
+  <div class="panel" id="panel-promotion">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>曝光与点击趋势</h3>
+        <div class="chart-body" id="chartExposureClick"></div>
+      </div>
+      <div class="chart-card">
+        <h3>转化漏斗</h3>
+        <div class="chart-body" id="chartFunnel"></div>
+      </div>
+      <div class="chart-card">
+        <h3>客资获取成本趋势</h3>
+        <div class="chart-body" id="chartLeadCost"></div>
+      </div>
+      <div class="chart-card">
+        <h3>季度浏览量对比</h3>
+        <div class="chart-body" id="chartQuarter"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月度报告 -->
+  <div class="panel" id="panel-report">
+    <div id="reportContent">
+      <div class="loading">正在生成报告</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 数据与状态 ============
+let allData = null;
+let currentMonth = 'all';
+
+// ============ 工具函数 ============
+function fmt(n) {
+  if (n === null || n === undefined) return '-';
+  return Number(n).toLocaleString('zh-CN');
+}
+function fmtMoney(n) {
+  if (n === null || n === undefined) return '-';
+  return '¥' + Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtPct(n) {
+  if (n === null || n === undefined) return '-';
+  return Number(n).toFixed(2) + '%';
+}
+function deltaText(cur, prev) {
+  if (!prev || prev === 0) return cur > 0 ? { text: '新增', cls: 'up' } : { text: '-', cls: '' };
+  const pct = ((cur - prev) / prev * 100).toFixed(1);
+  if (pct > 0) return { text: '↑' + pct + '%', cls: 'up' };
+  if (pct < 0) return { text: '↓' + Math.abs(pct) + '%', cls: 'down' };
+  return { text: '持平', cls: '' };
+}
+
+// ============ 数据加载 ============
+async function loadData() {
+  try {
+    const resp = await fetch('/api/aishilai/data');
+    const json = await resp.json();
+    if (json.ok && json.data) {
+      allData = json.data;
+      return true;
+    }
+  } catch (e) {
+    console.error('加载数据失败:', e);
+  }
+  return false;
+}
+
+// ============ 数据聚合 ============
+function aggregateByMonth(data, month) {
+  if (!data || !data.storeReport) return null;
+  
+  let filtered = data.storeReport;
+  if (month !== 'all') {
+    filtered = filtered.filter(r => r.date.startsWith(month));
+  }
+  
+  if (filtered.length === 0) return null;
+  
+  const agg = {
+    month,
+    days: filtered.length,
+    cost: 0,
+    exposure: 0,
+    clicks: 0,
+    merchantViews: 0,
+    phoneViews: 0,
+    onlineConsultClicks: 0,
+    reviewViews: 0,
+    prepaidOrderQty: 0,
+    appointmentIntent: 0,
+    customerLeads: 0,
+    prepaidClicks: 0,
+  };
+  
+  filtered.forEach(r => {
+    agg.cost += r.cost || 0;
+    agg.exposure += r.exposure || 0;
+    agg.clicks += r.clicks || 0;
+    agg.merchantViews += r.merchantViews || 0;
+    agg.phoneViews += r.phoneViews || 0;
+    agg.onlineConsultClicks += r.onlineConsultClicks || 0;
+    agg.reviewViews += r.reviewViews || 0;
+    agg.prepaidOrderQty += r.prepaidOrderQty || 0;
+    agg.appointmentIntent += r.appointmentIntent || 0;
+    agg.customerLeads += r.customerLeads || 0;
+    agg.prepaidClicks += r.prepaidClicks || 0;
+  });
+  
+  // 计算衍生指标
+  agg.clickAvgPrice = agg.clicks > 0 ? agg.cost / agg.clicks : 0;
+  agg.leadCost = agg.customerLeads > 0 ? agg.cost / agg.customerLeads : 0;
+  agg.clickRate = agg.exposure > 0 ? (agg.clicks / agg.exposure * 100) : 0;
+  agg.leadRate = agg.clicks > 0 ? (agg.customerLeads / agg.clicks * 100) : 0;
+  
+  return agg;
+}
+
+function getMonthlyList(data) {
+  if (!data || !data.storeReport) return [];
+  
+  const byMonth = {};
+  data.storeReport.forEach(r => {
+    const mk = r.date.slice(0, 7);
+    if (!byMonth[mk]) {
+      byMonth[mk] = { month: mk, cost: 0, exposure: 0, clicks: 0, customerLeads: 0, days: 0 };
+    }
+    byMonth[mk].cost += r.cost || 0;
+    byMonth[mk].exposure += r.exposure || 0;
+    byMonth[mk].clicks += r.clicks || 0;
+    byMonth[mk].customerLeads += r.customerLeads || 0;
+    byMonth[mk].days++;
+  });
+  
+  return Object.values(byMonth).sort((a, b) => a.month.localeCompare(b.month));
+}
+
+// ============ 渲染 KPI 卡片 ============
+function renderKPI(agg, prevAgg) {
+  const container = document.getElementById('kpiCards');
+  if (!agg) {
+    container.innerHTML = '<div class="empty">暂无数据</div>';
+    return;
+  }
+  
+  const kpis = [
+    { lab: '推广花费', val: fmtMoney(agg.cost), sub: agg.days + '天', color: '#E11D48', delta: deltaText(agg.cost, prevAgg?.cost) },
+    { lab: '总曝光', val: fmt(agg.exposure), sub: '日均 ' + fmt(Math.round(agg.exposure / agg.days)), color: '#4F46E5', delta: deltaText(agg.exposure, prevAgg?.exposure) },
+    { lab: '总点击', val: fmt(agg.clicks), sub: '点击率 ' + fmtPct(agg.clickRate), color: '#0891B2', delta: deltaText(agg.clicks, prevAgg?.clicks) },
+    { lab: '点击均价', val: '¥' + agg.clickAvgPrice.toFixed(2), sub: '每次点击成本', color: '#D97706', delta: deltaText(agg.clickAvgPrice, prevAgg?.clickAvgPrice) },
+    { lab: '商户浏览量', val: fmt(agg.merchantViews), sub: '日均 ' + fmt(Math.round(agg.merchantViews / agg.days)), color: '#059669', delta: deltaText(agg.merchantViews, prevAgg?.merchantViews) },
+    { lab: '客资量', val: fmt(agg.customerLeads), sub: '转化率 ' + fmtPct(agg.leadRate), color: '#7C3AED', delta: deltaText(agg.customerLeads, prevAgg?.customerLeads) },
+    { lab: '客资成本', val: fmtMoney(agg.leadCost), sub: '每个客资成本', color: '#DC2626', delta: deltaText(agg.leadCost, prevAgg?.leadCost) },
+    { lab: '预约意向', val: fmt(agg.appointmentIntent), sub: '日均 ' + fmt(Math.round(agg.appointmentIntent / agg.days)), color: '#059669', delta: deltaText(agg.appointmentIntent, prevAgg?.appointmentIntent) },
+  ];
+  
+  container.innerHTML = kpis.map(k => `
+    <div class="kpi" style="--kc:${k.color}">
+      <div class="lab">${k.lab}</div>
+      <div class="val">${k.val}</div>
+      <div class="sub">${k.sub}</div>
+      ${k.delta.text !== '-' ? `<div class="delta ${k.delta.cls}">${k.delta.text}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ============ SVG 图表 ============
+function lineChart(labels, datasets, width = 700, height = 280) {
+  const padL = 60, padR = 20, padT = 20, padB = 40;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
+  
+  // 计算最大值
+  let maxVal = 0;
+  datasets.forEach(ds => {
+    ds.data.forEach(v => { if (v > maxVal) maxVal = v; });
+  });
+  maxVal = maxVal * 1.1 || 1;
+  
+  // 生成网格线
+  let gridLines = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + chartH * (1 - i / 4);
+    const val = (maxVal * i / 4).toFixed(0);
+    gridLines += `<line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="#E8ECF4" stroke-width="1"/>`;
+    gridLines += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="11">${val}</text>`;
+  }
+  
+  // 生成X轴标签
+  let xLabels = '';
+  const step = Math.max(1, Math.floor(labels.length / 8));
+  labels.forEach((l, i) => {
+    if (i % step === 0 || i === labels.length - 1) {
+      const x = padL + (i / (labels.length - 1 || 1)) * chartW;
+      xLabels += `<text x="${x}" y="${height - 10}" text-anchor="middle" fill="#94A3B8" font-size="11">${l}</text>`;
+    }
+  });
+  
+  // 生成折线
+  let lines = '';
+  const colors = ['#4F46E5', '#059669', '#E11D48', '#D97706', '#0891B2'];
+  datasets.forEach((ds, di) => {
+    const color = ds.color || colors[di % colors.length];
+    let path = '';
+    ds.data.forEach((v, i) => {
+      const x = padL + (i / (labels.length - 1 || 1)) * chartW;
+      const y = padT + chartH * (1 - v / maxVal);
+      path += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+    });
+    lines += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    
+    // 数据点
+    ds.data.forEach((v, i) => {
+      const x = padL + (i / (labels.length - 1 || 1)) * chartW;
+      const y = padT + chartH * (1 - v / maxVal);
+      lines += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${color}"/>`;
+    });
+  });
+  
+  // 图例
+  let legend = '';
+  datasets.forEach((ds, di) => {
+    const color = ds.color || colors[di % colors.length];
+    const x = padL + di * 120;
+    legend += `<rect x="${x}" y="${height - 8}" width="12" height="12" rx="2" fill="${color}"/>`;
+    legend += `<text x="${x + 16}" y="${height}" fill="#475569" font-size="12">${ds.name || ''}</text>`;
+  });
+  
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+    ${gridLines}${xLabels}${lines}${legend}
+  </svg>`;
+}
+
+function barChart(labels, datasets, width = 700, height = 280) {
+  const padL = 60, padR = 20, padT = 20, padB = 50;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
+  
+  // 计算最大值
+  let maxVal = 0;
+  datasets.forEach(ds => {
+    ds.data.forEach(v => { if (v > maxVal) maxVal = v; });
+  });
+  maxVal = maxVal * 1.1 || 1;
+  
+  // 生成网格线
+  let gridLines = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + chartH * (1 - i / 4);
+    const val = (maxVal * i / 4).toFixed(0);
+    gridLines += `<line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="#E8ECF4" stroke-width="1"/>`;
+    gridLines += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="11">${val}</text>`;
+  }
+  
+  const groupW = chartW / labels.length;
+  const barW = groupW * 0.7 / datasets.length;
+  const colors = ['#4F46E5', '#059669', '#E11D48', '#D97706'];
+  
+  let bars = '';
+  let xLabels = '';
+  
+  labels.forEach((l, i) => {
+    const groupX = padL + i * groupW + groupW * 0.15;
+    
+    datasets.forEach((ds, di) => {
+      const x = groupX + di * barW;
+      const h = (ds.data[i] / maxVal) * chartH;
+      const y = padT + chartH - h;
+      const color = ds.color || colors[di % colors.length];
+      bars += `<rect x="${x}" y="${y}" width="${barW - 2}" height="${h}" rx="4" fill="${color}"/>`;
+    });
+    
+    xLabels += `<text x="${padL + i * groupW + groupW / 2}" y="${height - 20}" text-anchor="middle" fill="#94A3B8" font-size="11">${l}</text>`;
+  });
+  
+  // 图例
+  let legend = '';
+  datasets.forEach((ds, di) => {
+    const color = ds.color || colors[di % colors.length];
+    const x = padL + di * 120;
+    legend += `<rect x="${x}" y="${height - 8}" width="12" height="12" rx="2" fill="${color}"/>`;
+    legend += `<text x="${x + 16}" y="${height}" fill="#475569" font-size="12">${ds.name || ''}</text>`;
+  });
+  
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+    ${gridLines}${xLabels}${bars}${legend}
+  </svg>`;
+}
+
+function funnelChart(items, width = 400, height = 300) {
+  const padL = 20, padR = 20, padT = 20, padB = 20;
+  const chartW = width - padL - padR;
+  const chartH = height - padT - padB;
+  
+  const maxVal = items[0]?.value || 1;
+  const itemH = chartH / items.length;
+  const colors = ['#4F46E5', '#0891B2', '#059669', '#D97706', '#E11D48'];
+  
+  let shapes = '';
+  items.forEach((item, i) => {
+    const y = padT + i * itemH;
+    const w = (item.value / maxVal) * chartW;
+    const x = padL + (chartW - w) / 2;
+    const color = colors[i % colors.length];
+    
+    shapes += `<rect x="${x}" y="${y + 4}" width="${w}" height="${itemH - 8}" rx="8" fill="${color}" opacity="0.9"/>`;
+    shapes += `<text x="${width / 2}" y="${y + itemH / 2 + 5}" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">${item.label}: ${fmt(item.value)}</text>`;
+  });
+  
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+    ${shapes}
+  </svg>`;
+}
+
+// ============ 渲染图表 ============
+function renderCharts() {
+  if (!allData) return;
+  
+  const monthlyList = getMonthlyList(allData);
+  if (monthlyList.length === 0) return;
+  
+  // 月度总览 - 花费趋势
+  const costData = monthlyList.map(m => m.cost);
+  const labels = monthlyList.map(m => m.month.slice(5) + '月');
+  document.getElementById('chartCost').innerHTML = lineChart(labels, [{ name: '推广花费', data: costData, color: '#E11D48' }]);
+  
+  // 月度总览 - 流量趋势
+  const exposureData = monthlyList.map(m => m.exposure);
+  const clicksData = monthlyList.map(m => m.clicks);
+  document.getElementById('chartTraffic').innerHTML = lineChart(labels, [
+    { name: '曝光', data: exposureData, color: '#4F46E5' },
+    { name: '点击', data: clicksData, color: '#0891B2' }
+  ]);
+  
+  // 推广效果 - 曝光与点击
+  document.getElementById('chartExposureClick').innerHTML = barChart(labels, [
+    { name: '曝光', data: exposureData, color: '#4F46E5' },
+    { name: '点击', data: clicksData, color: '#0891B2' }
+  ]);
+  
+  // 推广效果 - 转化漏斗（当前选中月份或全部）
+  const agg = aggregateByMonth(allData, currentMonth);
+  if (agg) {
+    document.getElementById('chartFunnel').innerHTML = funnelChart([
+      { label: '曝光', value: agg.exposure },
+      { label: '点击', value: agg.clicks },
+      { label: '浏览', value: agg.merchantViews },
+      { label: '客资', value: agg.customerLeads },
+      { label: '预约', value: agg.appointmentIntent }
+    ]);
+  }
+  
+  // 推广效果 - 客资成本趋势
+  const leadCostData = monthlyList.map(m => m.customerLeads > 0 ? m.cost / m.customerLeads : 0);
+  document.getElementById('chartLeadCost').innerHTML = lineChart(labels, [
+    { name: '客资成本', data: leadCostData, color: '#D97706' }
+  ]);
+  
+  // 推广效果 - 季度浏览量对比
+  if (allData.promotionSummary && allData.promotionSummary.length > 0) {
+    const qLabels = allData.promotionSummary.map(p => p.period.replace('2026-', ''));
+    const totalViews = allData.promotionSummary.map(p => p.totalViews);
+    const adViews = allData.promotionSummary.map(p => p.adViews);
+    document.getElementById('chartQuarter').innerHTML = barChart(qLabels, [
+      { name: '总浏览量', data: totalViews, color: '#4F46E5' },
+      { name: '广告浏览量', data: adViews, color: '#059669' }
+    ]);
+  }
+}
+
+// ============ 生成报告 ============
+function generateReport() {
+  const container = document.getElementById('reportContent');
+  if (!allData) {
+    container.innerHTML = '<div class="empty">暂无数据</div>';
+    return;
+  }
+  
+  const agg = aggregateByMonth(allData, currentMonth);
+  if (!agg) {
+    container.innerHTML = '<div class="empty">该月份暂无数据</div>';
+    return;
+  }
+  
+  // 获取上月数据用于环比
+  const months = getMonthlyList(allData).map(m => m.month);
+  const currentIdx = months.indexOf(currentMonth);
+  const prevMonth = currentIdx > 0 ? months[currentIdx - 1] : null;
+  const prevAgg = prevMonth ? aggregateByMonth(allData, prevMonth) : null;
+  
+  const monthName = currentMonth === 'all' ? '全部月份' : currentMonth.replace('-', '年') + '月';
+  
+  // 报告头部
+  let headerHTML = `
+    <div class="report-header">
+      <h2>艾诗莱美 ${monthName} 数据分析报告</h2>
+      <p>报告周期：${agg.days} 天 | 生成时间：${new Date().toLocaleDateString('zh-CN')}</p>
+    </div>
+  `;
+  
+  // 核心指标摘要
+  let summaryHTML = `
+    <div class="report-section">
+      <h3>核心指标摘要</h3>
+      <p>• 推广总花费：<span class="highlight">${fmtMoney(agg.cost)}</span>，日均 <span class="highlight">${fmtMoney(agg.cost / agg.days)}</span></p>
+      <p>• 总曝光量：<span class="highlight">${fmt(agg.exposure)}</span> 次，日均 <span class="highlight">${fmt(Math.round(agg.exposure / agg.days))}</span> 次</p>
+      <p>• 总点击量：<span class="highlight">${fmt(agg.clicks)}</span> 次，点击率 <span class="highlight">${fmtPct(agg.clickRate)}</span></p>
+      <p>• 客资获取：<span class="highlight">${fmt(agg.customerLeads)}</span> 个，客资成本 <span class="highlight">${fmtMoney(agg.leadCost)}</span></p>
+      <p>• 预约意向：<span class="highlight">${fmt(agg.appointmentIntent)}</span> 个</p>
+  `;
+  
+  if (prevAgg) {
+    const costDelta = ((agg.cost - prevAgg.cost) / prevAgg.cost * 100).toFixed(1);
+    const leadsDelta = ((agg.customerLeads - prevAgg.customerLeads) / (prevAgg.customerLeads || 1) * 100).toFixed(1);
+    summaryHTML += `<p style="margin-top:16px">环比上月：花费 <span class="${costDelta > 0 ? 'highlight-up' : 'highlight-down'}">${costDelta > 0 ? '↑' : '↓'}${Math.abs(costDelta)}%</span>，客资 <span class="${leadsDelta > 0 ? 'highlight-up' : 'highlight-down'}">${leadsDelta > 0 ? '↑' : '↓'}${Math.abs(leadsDelta)}%</span></p>`;
+  }
+  summaryHTML += '</div>';
+  
+  // 推广效果分析
+  let promotionHTML = `
+    <div class="report-section">
+      <h3>推广效果分析</h3>
+      <p>本月推广投入 <span class="highlight">${fmtMoney(agg.cost)}</span>，获得 <span class="highlight">${fmt(agg.exposure)}</span> 次曝光和 <span class="highlight">${fmt(agg.clicks)}</span> 次点击。</p>
+      <p>点击均价为 <span class="highlight">¥${agg.clickAvgPrice.toFixed(2)}</span>，${agg.clickAvgPrice > 10 ? '高于行业平均水平，建议优化投放策略' : '处于合理区间'}。</p>
+      <p>点击率为 <span class="highlight">${fmtPct(agg.clickRate)}</span>，${agg.clickRate < 3 ? '偏低，需要优化创意素材和落地页' : '表现良好'}。</p>
+  `;
+  
+  if (agg.customerLeads > 0) {
+    promotionHTML += `<p>客资转化方面，共获取 <span class="highlight">${fmt(agg.customerLeads)}</span> 个客资，单个客资成本 <span class="highlight">${fmtMoney(agg.leadCost)}</span>。</p>`;
+  } else {
+    promotionHTML += `<p><span class="highlight-down">本月暂无客资转化，需要重点关注转化链路优化。</span></p>`;
+  }
+  promotionHTML += '</div>';
+  
+  // 流量分析
+  let trafficHTML = `
+    <div class="report-section">
+      <h3>流量分析</h3>
+      <p>商户浏览量达到 <span class="highlight">${fmt(agg.merchantViews)}</span> 次，日均 <span class="highlight">${fmt(Math.round(agg.merchantViews / agg.days))}</span> 次。</p>
+      <p>在线咨询点击 <span class="highlight">${fmt(agg.onlineConsultClicks)}</span> 次，查看评论 <span class="highlight">${fmt(agg.reviewViews)}</span> 次。</p>
+      <p>查看电话 <span class="highlight">${fmt(agg.phoneViews)}</span> 次，预付商品点击 <span class="highlight">${fmt(agg.prepaidClicks)}</span> 次。</p>
+      <p>预付商品订单量 <span class="highlight">${fmt(agg.prepaidOrderQty)}</span> 个。</p>
+  `;
+  
+  const consultRate = agg.clicks > 0 ? (agg.onlineConsultClicks / agg.clicks * 100).toFixed(2) : 0;
+  trafficHTML += `<p>在线咨询率为 <span class="highlight">${consultRate}%</span>，${consultRate < 1 ? '偏低，建议加强咨询入口引导' : '表现正常'}。</p>`;
+  trafficHTML += '</div>';
+  
+  // 优化建议
+  let suggestionsHTML = `
+    <div class="report-section">
+      <h3>优化建议</h3>
+      <ul>
+  `;
+  
+  if (agg.clickAvgPrice > 10) {
+    suggestionsHTML += '<li><strong>降低点击成本：</strong>当前点击均价偏高，建议优化关键词出价策略，增加长尾关键词投放，提升质量分。</li>';
+  }
+  
+  if (agg.clickRate < 3) {
+    suggestionsHTML += '<li><strong>提升点击率：</strong>优化广告创意素材，突出门店特色和优惠活动，A/B测试不同文案效果。</li>';
+  }
+  
+  if (agg.customerLeads === 0 || agg.leadCost > 500) {
+    suggestionsHTML += '<li><strong>优化转化链路：</strong>检查落地页加载速度和转化引导，优化咨询话术，提升客资转化率。</li>';
+  }
+  
+  if (agg.onlineConsultClicks < 10) {
+    suggestionsHTML += '<li><strong>加强咨询引导：</strong>在页面显著位置增加咨询入口，设置自动回复话术，提升在线咨询量。</li>';
+  }
+  
+  suggestionsHTML += '<li><strong>关注评价管理：</strong>鼓励满意客户留下好评，及时回复负面评价，提升门店口碑。</li>';
+  suggestionsHTML += '<li><strong>数据分析常态化：</strong>建议每周复盘数据趋势，及时发现问题并调整策略。</li>';
+  suggestionsHTML += '</ul></div>';
+  
+  container.innerHTML = headerHTML + summaryHTML + promotionHTML + trafficHTML + suggestionsHTML;
+}
+
+// ============ 事件绑定 ============
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+    
+    if (tab.dataset.panel === 'report') {
+      generateReport();
+    }
+  });
+});
+
+document.getElementById('monthSelect').addEventListener('change', (e) => {
+  currentMonth = e.target.value;
+  refreshAll();
+});
+
+// ============ 统一刷新入口 ============
+function refreshAll() {
+  if (!allData) return;
+  
+  const agg = aggregateByMonth(allData, currentMonth);
+  
+  // 获取上月数据用于环比
+  const months = getMonthlyList(allData).map(m => m.month);
+  const currentIdx = months.indexOf(currentMonth);
+  const prevMonth = currentIdx > 0 ? months[currentIdx - 1] : null;
+  const prevAgg = prevMonth ? aggregateByMonth(allData, prevMonth) : null;
+  
+  renderKPI(agg, prevAgg);
+  renderCharts();
+  
+  if (document.getElementById('panel-report').classList.contains('active')) {
+    generateReport();
+  }
+}
+
+// ============ 初始化 ============
+async function init() {
+  const loaded = await loadData();
+  if (!loaded) {
+    document.getElementById('kpiCards').innerHTML = '<div class="empty">数据加载失败，请刷新页面重试</div>';
+    return;
+  }
+  
+  // 默认选中最新月份
+  const months = getMonthlyList(allData).map(m => m.month);
+  if (months.length > 0) {
+    currentMonth = months[months.length - 1];
+    document.getElementById('monthSelect').value = currentMonth;
+  }
+  
+  refreshAll();
+}
+
+init();
+</script>
+</body>
+</html>

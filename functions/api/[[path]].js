@@ -10,6 +10,7 @@ import { onRequest as adminHandler } from './_admin.js';
 import { onRequest as salaryHandler } from './_salary.js';
 import { onRequest as ledgerHandler } from './_ledger.js';
 import { onRequest as approvalsHandler } from './_approvals.js';
+import { onRequest as aishilaiHandler } from './_aishilai.js';
 
 export async function onRequest(context) {
   // Pages Functions 传入 context（含 request / env / params），

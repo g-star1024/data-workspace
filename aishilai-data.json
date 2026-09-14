@@ -1,0 +1,19 @@
+{
+  "storeReport": [
+    {"date": "2026-01-01", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 1382.72, "exposure": 6049, "clicks": 198, "clickAvgPrice": 6.98, "merchantViews": 366, "phoneViews": 1, "onlineConsultClicks": 3, "reviewViews": 8, "prepaidOrderQty": 4, "appointmentIntent": 8, "customerLeads": 2, "prepaidClicks": 6},
+    {"date": "2026-01-02", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 1277.23, "exposure": 6050, "clicks": 191, "clickAvgPrice": 6.69, "merchantViews": 420, "phoneViews": 1, "onlineConsultClicks": 23, "reviewViews": 13, "prepaidOrderQty": 2, "appointmentIntent": 8, "customerLeads": 2, "prepaidClicks": 0},
+    {"date": "2026-01-03", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 1254.65, "exposure": 5089, "clicks": 176, "clickAvgPrice": 7.13, "merchantViews": 316, "phoneViews": 1, "onlineConsultClicks": 2, "reviewViews": 8, "prepaidOrderQty": 0, "appointmentIntent": 3, "customerLeads": 1, "prepaidClicks": 0},
+    {"date": "2026-01-04", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 294.02, "exposure": 962, "clicks": 43, "clickAvgPrice": 6.84, "merchantViews": 111, "phoneViews": 0, "onlineConsultClicks": 0, "reviewViews": 0, "prepaidOrderQty": 0, "appointmentIntent": 0, "customerLeads": 0, "prepaidClicks": 0},
+    {"date": "2026-01-05", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 390.56, "exposure": 1176, "clicks": 48, "clickAvgPrice": 8.14, "merchantViews": 118, "phoneViews": 1, "onlineConsultClicks": 2, "reviewViews": 4, "prepaidOrderQty": 1, "appointmentIntent": 4, "customerLeads": 1, "prepaidClicks": 0},
+    {"date": "2026-01-06", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 473.76, "exposure": 1917, "clicks": 59, "clickAvgPrice": 8.03, "merchantViews": 113, "phoneViews": 0, "onlineConsultClicks": 0, "reviewViews": 10, "prepaidOrderQty": 0, "appointmentIntent": 0, "customerLeads": 0, "prepaidClicks": 0},
+    {"date": "2026-01-07", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 971.62, "exposure": 3280, "clicks": 119, "clickAvgPrice": 8.16, "merchantViews": 264, "phoneViews": 0, "onlineConsultClicks": 0, "reviewViews": 20, "prepaidOrderQty": 2, "appointmentIntent": 2, "customerLeads": 0, "prepaidClicks": 1},
+    {"date": "2026-01-08", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 1031.91, "exposure": 3282, "clicks": 120, "clickAvgPrice": 8.6, "merchantViews": 238, "phoneViews": 0, "onlineConsultClicks": 3, "reviewViews": 3, "prepaidOrderQty": 0, "appointmentIntent": 2, "customerLeads": 0, "prepaidClicks": 0},
+    {"date": "2026-01-09", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 916.65, "exposure": 2786, "clicks": 105, "clickAvgPrice": 8.73, "merchantViews": 204, "phoneViews": 1, "onlineConsultClicks": 0, "reviewViews": 8, "prepaidOrderQty": 0, "appointmentIntent": 1, "customerLeads": 0, "prepaidClicks": 0},
+    {"date": "2026-01-10", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "storeId": "1019428095", "city": "青岛", "cost": 1050.69, "exposure": 3397, "clicks": 126, "clickAvgPrice": 8.34, "merchantViews": 236, "phoneViews": 1, "onlineConsultClicks": 0, "reviewViews": 1, "prepaidOrderQty": 0, "appointmentIntent": 1, "customerLeads": 0, "prepaidClicks": 0}
+  ],
+  "promotionSummary": [
+    {"period": "2026-Q1", "city": "青岛", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "totalViews": 23906, "adViews": 17703, "adDays": 83},
+    {"period": "2026-Q2", "city": "青岛", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "totalViews": 53457, "adViews": 35877, "adDays": 88},
+    {"period": "2026-Q3", "city": "青岛", "store": "艾诗莱美·医疗美容·注射抗衰·眼鼻修复中心(市北店)", "totalViews": 50042, "adViews": 32216, "adDays": 65}
+  ]
+}
