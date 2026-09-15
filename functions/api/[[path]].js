@@ -30,6 +30,7 @@ export async function onRequest(context) {
   if (path.startsWith('/api/salary')) return salaryHandler(req, env);
   if (path.startsWith('/api/ledger')) return ledgerHandler(req, env);
   if (path.startsWith('/api/approvals')) return approvalsHandler(req, env);
+  if (path.startsWith('/api/aishilai')) return aishilaiHandler(req, env);
 
   return json({ ok: false, msg: '不支持的路径：' + path }, 404);
 }
