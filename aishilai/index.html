@@ -479,24 +479,40 @@ function barChart(labels, datasets, width = 700, height = 280) {
   </svg>`;
 }
 
-function funnelChart(items, width = 400, height = 300) {
-  const padL = 20, padR = 20, padT = 20, padB = 20;
+function funnelChart(items, width = 400, height = 340) {
+  const padL = 10, padR = 10, padT = 10, padB = 10;
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
-  
-  const maxVal = items[0]?.value || 1;
   const itemH = chartH / items.length;
   const colors = ['#4F46E5', '#0891B2', '#059669', '#D97706', '#E11D48'];
+  
+  // 使用对数比例，避免曝光量3万+和客资几十的差距导致小值不可见
+  const logVals = items.map(it => it.value > 0 ? Math.log10(it.value) : 0);
+  const maxLog = Math.max(...logVals, 1);
   
   let shapes = '';
   items.forEach((item, i) => {
     const y = padT + i * itemH;
-    const w = (item.value / maxVal) * chartW;
+    const ratio = itemH > 40 ? (itemH - 12) / itemH : 0.7;
+    const barH = itemH * ratio;
+    const barY = y + (itemH - barH) / 2;
+    
+    // 对数宽度：最小宽度保证文字可读
+    const logRatio = logVals[i] / maxLog;
+    const minW = 120; // 最小宽度，保证标签可读
+    const w = Math.max(minW, logRatio * chartW);
     const x = padL + (chartW - w) / 2;
     const color = colors[i % colors.length];
     
-    shapes += `<rect x="${x}" y="${y + 4}" width="${w}" height="${itemH - 8}" rx="8" fill="${color}" opacity="0.9"/>`;
-    shapes += `<text x="${width / 2}" y="${y + itemH / 2 + 5}" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">${item.label}: ${fmt(item.value)}</text>`;
+    // 计算转化率
+    let rateText = '';
+    if (i > 0 && items[i-1].value > 0) {
+      const rate = (item.value / items[i-1].value * 100).toFixed(1);
+      rateText = ` (${rate}%)`;
+    }
+    
+    shapes += `<rect x="${x}" y="${barY}" width="${w}" height="${barH}" rx="10" fill="${color}" opacity="0.92"/>`;
+    shapes += `<text x="${width / 2}" y="${barY + barH / 2 + 5}" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">${item.label}: ${fmt(item.value)}${rateText}</text>`;
   });
   
   return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
@@ -582,90 +598,247 @@ function generateReport() {
   
   const monthName = currentMonth === 'all' ? '全部月份' : currentMonth.replace('-', '年') + '月';
   
-  // 报告头部
-  let headerHTML = `
+  // ===== 报告头部：精简提炼 =====
+  const totalCost = agg.cost;
+  const totalLeads = agg.customerLeads;
+  const leadCost = agg.leadCost;
+  const clickRate = agg.clickRate;
+  const clickAvgPrice = agg.clickAvgPrice;
+  
+  // 环比变化
+  let momSummary = '';
+  if (prevAgg) {
+    const costDelta = ((agg.cost - prevAgg.cost) / prevAgg.cost * 100).toFixed(1);
+    const leadsDelta = prevAgg.customerLeads > 0 ? ((agg.customerLeads - prevAgg.customerLeads) / prevAgg.customerLeads * 100).toFixed(1) : 'N/A';
+    const exposureDelta = ((agg.exposure - prevAgg.exposure) / prevAgg.exposure * 100).toFixed(1);
+    momSummary = `环比上月：花费${costDelta > 0 ? '↑' : '↓'}${Math.abs(costDelta)}%，曝光${exposureDelta > 0 ? '↑' : '↓'}${Math.abs(exposureDelta)}%，客资${leadsDelta === 'N/A' ? '新增' : (leadsDelta > 0 ? '↑' : '↓') + Math.abs(leadsDelta) + '%'}。`;
+  }
+  
+  // 亮点与问题
+  let highlights = [];
+  let issues = [];
+  if (clickRate > 4) highlights.push(`点击率${fmtPct(clickRate)}，表现优秀`);
+  else if (clickRate < 2.5) issues.push(`点击率${fmtPct(clickRate)}，低于行业均值`);
+  if (clickAvgPrice < 8) highlights.push(`点击均价¥${clickAvgPrice.toFixed(2)}，成本控制良好`);
+  else if (clickAvgPrice > 10) issues.push(`点击均价¥${clickAvgPrice.toFixed(2)}，高于合理区间`);
+  if (totalLeads > 30) highlights.push(`客资量${fmt(totalLeads)}个，转化效果突出`);
+  else if (totalLeads < 10 && totalLeads > 0) issues.push(`客资量仅${fmt(totalLeads)}个，转化链路需优化`);
+  if (totalLeads === 0) issues.push('本月零客资转化，需紧急排查转化链路');
+  
+  const headerHTML = `
     <div class="report-header">
       <h2>艾诗莱美 ${monthName} 数据分析报告</h2>
       <p>报告周期：${agg.days} 天 | 生成时间：${new Date().toLocaleDateString('zh-CN')}</p>
+      <p style="margin-top:12px;font-size:15px">
+        <strong>核心数据：</strong>花费 ${fmtMoney(totalCost)} | 曝光 ${fmt(agg.exposure)} 次 | 点击 ${fmt(agg.clicks)} 次 | 客资 ${fmt(totalLeads)} 个 | 客资成本 ${fmtMoney(leadCost)}
+      </p>
+      ${momSummary ? `<p style="margin-top:8px;font-size:14px;opacity:.85">${momSummary}</p>` : ''}
+      ${highlights.length ? `<p style="margin-top:8px;font-size:14px">✅ 亮点：${highlights.join('；')}</p>` : ''}
+      ${issues.length ? `<p style="margin-top:8px;font-size:14px">⚠️ 关注：${issues.join('；')}</p>` : ''}
     </div>
   `;
   
-  // 核心指标摘要
-  let summaryHTML = `
+  // ===== 一、推广投入与流量分析 =====
+  const dailyCost = totalCost / agg.days;
+  const dailyExposure = Math.round(agg.exposure / agg.days);
+  const dailyClicks = Math.round(agg.clicks / agg.days);
+  const exposureToClickRate = clickRate;
+  
+  let section1 = `
     <div class="report-section">
-      <h3>核心指标摘要</h3>
-      <p>• 推广总花费：<span class="highlight">${fmtMoney(agg.cost)}</span>，日均 <span class="highlight">${fmtMoney(agg.cost / agg.days)}</span></p>
-      <p>• 总曝光量：<span class="highlight">${fmt(agg.exposure)}</span> 次，日均 <span class="highlight">${fmt(Math.round(agg.exposure / agg.days))}</span> 次</p>
-      <p>• 总点击量：<span class="highlight">${fmt(agg.clicks)}</span> 次，点击率 <span class="highlight">${fmtPct(agg.clickRate)}</span></p>
-      <p>• 客资获取：<span class="highlight">${fmt(agg.customerLeads)}</span> 个，客资成本 <span class="highlight">${fmtMoney(agg.leadCost)}</span></p>
-      <p>• 预约意向：<span class="highlight">${fmt(agg.appointmentIntent)}</span> 个</p>
+      <h3>一、推广投入与流量分析</h3>
+      <p>${monthName}推广总投入 <span class="highlight">${fmtMoney(totalCost)}</span>，覆盖 ${agg.days} 天，日均花费 <span class="highlight">${fmtMoney(dailyCost)}</span>。
+      共获得 <span class="highlight">${fmt(agg.exposure)}</span> 次曝光和 <span class="highlight">${fmt(agg.clicks)}</span> 次点击，
+      日均曝光 <span class="highlight">${fmt(dailyExposure)}</span> 次、日均点击 <span class="highlight">${fmt(dailyClicks)}</span> 次。</p>
+      
+      <p>点击率为 <span class="highlight">${fmtPct(exposureToClickRate)}</span>，
+      ${exposureToClickRate >= 4 ? '处于优秀水平，说明广告创意和定向策略有效，用户对广告内容兴趣较高。' :
+        exposureToClickRate >= 2.5 ? '处于行业正常水平，但仍有提升空间，可通过优化创意素材和精准定向进一步提高。' :
+        '偏低，说明广告创意吸引力不足或定向人群不够精准，建议重点优化广告素材和投放人群。'}</p>
+      
+      <p>点击均价为 <span class="highlight">¥${clickAvgPrice.toFixed(2)}</span>，
+      ${clickAvgPrice <= 8 ? '成本控制良好，低于行业平均水平，说明投放效率较高。' :
+        clickAvgPrice <= 10 ? '处于合理区间，但仍有优化空间，可通过提升质量分降低单次点击成本。' :
+        '高于行业平均水平，建议优化关键词出价策略、增加长尾词投放、提升广告质量分以降低点击成本。'}</p>
   `;
   
   if (prevAgg) {
-    const costDelta = ((agg.cost - prevAgg.cost) / prevAgg.cost * 100).toFixed(1);
-    const leadsDelta = ((agg.customerLeads - prevAgg.customerLeads) / (prevAgg.customerLeads || 1) * 100).toFixed(1);
-    summaryHTML += `<p style="margin-top:16px">环比上月：花费 <span class="${costDelta > 0 ? 'highlight-up' : 'highlight-down'}">${costDelta > 0 ? '↑' : '↓'}${Math.abs(costDelta)}%</span>，客资 <span class="${leadsDelta > 0 ? 'highlight-up' : 'highlight-down'}">${leadsDelta > 0 ? '↑' : '↓'}${Math.abs(leadsDelta)}%</span></p>`;
+    const costChange = ((totalCost - prevAgg.cost) / prevAgg.cost * 100).toFixed(1);
+    const exposureChange = ((agg.exposure - prevAgg.exposure) / prevAgg.exposure * 100).toFixed(1);
+    const clicksChange = ((agg.clicks - prevAgg.clicks) / prevAgg.clicks * 100).toFixed(1);
+    section1 += `<p>环比上月：花费${costChange > 0 ? '增长' : '下降'} <span class="${costChange > 0 ? 'highlight-up' : 'highlight-down'}">${Math.abs(costChange)}%</span>，
+    曝光${exposureChange > 0 ? '增长' : '下降'} <span class="${exposureChange > 0 ? 'highlight-up' : 'highlight-down'}">${Math.abs(exposureChange)}%</span>，
+    点击${clicksChange > 0 ? '增长' : '下降'} <span class="${clicksChange > 0 ? 'highlight-up' : 'highlight-down'}">${Math.abs(clicksChange)}%</span>。</p>`;
   }
-  summaryHTML += '</div>';
+  section1 += '</div>';
   
-  // 推广效果分析
-  let promotionHTML = `
+  // ===== 二、流量转化与客资分析 =====
+  const dailyViews = Math.round(agg.merchantViews / agg.days);
+  const consultRate = agg.clicks > 0 ? (agg.onlineConsultClicks / agg.clicks * 100) : 0;
+  const reviewRate = agg.clicks > 0 ? (agg.reviewViews / agg.clicks * 100) : 0;
+  const phoneRate = agg.clicks > 0 ? (agg.phoneViews / agg.clicks * 100) : 0;
+  const leadConversionRate = agg.clicks > 0 ? (totalLeads / agg.clicks * 100) : 0;
+  const appointmentRate = agg.clicks > 0 ? (agg.appointmentIntent / agg.clicks * 100) : 0;
+  
+  let section2 = `
     <div class="report-section">
-      <h3>推广效果分析</h3>
-      <p>本月推广投入 <span class="highlight">${fmtMoney(agg.cost)}</span>，获得 <span class="highlight">${fmt(agg.exposure)}</span> 次曝光和 <span class="highlight">${fmt(agg.clicks)}</span> 次点击。</p>
-      <p>点击均价为 <span class="highlight">¥${agg.clickAvgPrice.toFixed(2)}</span>，${agg.clickAvgPrice > 10 ? '高于行业平均水平，建议优化投放策略' : '处于合理区间'}。</p>
-      <p>点击率为 <span class="highlight">${fmtPct(agg.clickRate)}</span>，${agg.clickRate < 3 ? '偏低，需要优化创意素材和落地页' : '表现良好'}。</p>
+      <h3>二、流量转化与客资分析</h3>
+      <p>本月商户浏览量 <span class="highlight">${fmt(agg.merchantViews)}</span> 次，日均 <span class="highlight">${fmt(dailyViews)}</span> 次。
+      从点击到浏览的转化率为 <span class="highlight">${fmtPct(agg.clicks > 0 ? agg.merchantViews / agg.clicks * 100 : 0)}</span>，
+      ${agg.clicks > 0 && agg.merchantViews / agg.clicks > 2 ? '说明用户点击后有较高的意愿深入了解门店信息。' : '说明部分用户点击后未深入浏览，需优化落地页内容吸引力。'}</p>
+      
+      <p>互动行为方面：在线咨询点击 <span class="highlight">${fmt(agg.onlineConsultClicks)}</span> 次（咨询率 ${fmtPct(consultRate)}），
+      查看评论 <span class="highlight">${fmt(agg.reviewViews)}</span> 次（评论浏览率 ${fmtPct(reviewRate)}），
+      查看电话 <span class="highlight">${fmt(agg.phoneViews)}</span> 次（电话查看率 ${fmtPct(phoneRate)}）。</p>
   `;
   
-  if (agg.customerLeads > 0) {
-    promotionHTML += `<p>客资转化方面，共获取 <span class="highlight">${fmt(agg.customerLeads)}</span> 个客资，单个客资成本 <span class="highlight">${fmtMoney(agg.leadCost)}</span>。</p>`;
+  // 客资分析
+  if (totalLeads > 0) {
+    section2 += `<p>本月共获取客资 <span class="highlight">${fmt(totalLeads)}</span> 个，日均 <span class="highlight">${(totalLeads / agg.days).toFixed(1)}</span> 个，
+    点击到客资的转化率为 <span class="highlight">${fmtPct(leadConversionRate)}</span>，
+    单个客资成本为 <span class="highlight">${fmtMoney(leadCost)}</span>。</p>`;
+    
+    if (leadCost > 500) {
+      section2 += `<p><span class="highlight-down">客资成本偏高（¥${leadCost.toFixed(0)}），建议优化转化链路，提升咨询话术和落地页转化效率。</span></p>`;
+    } else if (leadCost > 200) {
+      section2 += `<p>客资成本处于中等水平，可通过提升转化率和优化投放策略进一步降低。</p>`;
+    } else {
+      section2 += `<p><span class="highlight-up">客资成本控制良好（¥${leadCost.toFixed(0)}），转化效率较高。</span></p>`;
+    }
   } else {
-    promotionHTML += `<p><span class="highlight-down">本月暂无客资转化，需要重点关注转化链路优化。</span></p>`;
+    section2 += `<p><span class="highlight-down">本月客资量为零，这是需要紧急关注的问题。建议排查：①咨询入口是否明显 ②客服响应是否及时 ③落地页是否有明确的行动引导。</span></p>`;
   }
-  promotionHTML += '</div>';
   
-  // 流量分析
-  let trafficHTML = `
+  // 预约意向
+  section2 += `<p>预约及意向量 <span class="highlight">${fmt(agg.appointmentIntent)}</span> 个，
+  点击到预约的转化率为 <span class="highlight">${fmtPct(appointmentRate)}</span>，
+  ${appointmentRate > 1 ? '表现良好，说明用户有较高的到店意愿。' : '偏低，建议加强预约引导和优惠活动刺激。'}</p>`;
+  
+  // 预付商品
+  section2 += `<p>预付商品点击 <span class="highlight">${fmt(agg.prepaidClicks)}</span> 次，预付商品订单量 <span class="highlight">${fmt(agg.prepaidOrderQty)}</span> 个，
+  ${agg.prepaidOrderQty > 0 ? '说明推广通的商品展示功能有一定的转化效果。' : '预付商品转化为零，建议优化商品展示和价格策略。'}</p>`;
+  
+  if (prevAgg) {
+    const leadsChange = prevAgg.customerLeads > 0 ? ((totalLeads - prevAgg.customerLeads) / prevAgg.customerLeads * 100).toFixed(1) : 'N/A';
+    const viewsChange = ((agg.merchantViews - prevAgg.merchantViews) / prevAgg.merchantViews * 100).toFixed(1);
+    section2 += `<p>环比上月：浏览量${viewsChange > 0 ? '增长' : '下降'} ${Math.abs(viewsChange)}%，
+    客资${leadsChange === 'N/A' ? '从无到有' : (leadsChange > 0 ? '增长' : '下降') + ' ' + Math.abs(leadsChange) + '%'}。</p>`;
+  }
+  section2 += '</div>';
+  
+  // ===== 三、转化漏斗分析 =====
+  const funnelSteps = [
+    { label: '曝光', value: agg.exposure },
+    { label: '点击', value: agg.clicks },
+    { label: '浏览', value: agg.merchantViews },
+    { label: '客资', value: totalLeads },
+    { label: '预约', value: agg.appointmentIntent }
+  ];
+  
+  let section3 = `
     <div class="report-section">
-      <h3>流量分析</h3>
-      <p>商户浏览量达到 <span class="highlight">${fmt(agg.merchantViews)}</span> 次，日均 <span class="highlight">${fmt(Math.round(agg.merchantViews / agg.days))}</span> 次。</p>
-      <p>在线咨询点击 <span class="highlight">${fmt(agg.onlineConsultClicks)}</span> 次，查看评论 <span class="highlight">${fmt(agg.reviewViews)}</span> 次。</p>
-      <p>查看电话 <span class="highlight">${fmt(agg.phoneViews)}</span> 次，预付商品点击 <span class="highlight">${fmt(agg.prepaidClicks)}</span> 次。</p>
-      <p>预付商品订单量 <span class="highlight">${fmt(agg.prepaidOrderQty)}</span> 个。</p>
-  `;
-  
-  const consultRate = agg.clicks > 0 ? (agg.onlineConsultClicks / agg.clicks * 100).toFixed(2) : 0;
-  trafficHTML += `<p>在线咨询率为 <span class="highlight">${consultRate}%</span>，${consultRate < 1 ? '偏低，建议加强咨询入口引导' : '表现正常'}。</p>`;
-  trafficHTML += '</div>';
-  
-  // 优化建议
-  let suggestionsHTML = `
-    <div class="report-section">
-      <h3>优化建议</h3>
+      <h3>三、转化漏斗分析</h3>
+      <p>本月转化漏斗各环节数据如下：</p>
       <ul>
   `;
   
-  if (agg.clickAvgPrice > 10) {
-    suggestionsHTML += '<li><strong>降低点击成本：</strong>当前点击均价偏高，建议优化关键词出价策略，增加长尾关键词投放，提升质量分。</li>';
+  for (let i = 0; i < funnelSteps.length; i++) {
+    const step = funnelSteps[i];
+    const rate = i > 0 && funnelSteps[i-1].value > 0 ? (step.value / funnelSteps[i-1].value * 100).toFixed(2) : '100.00';
+    const overallRate = agg.exposure > 0 ? (step.value / agg.exposure * 100).toFixed(4) : '0.0000';
+    section3 += `<li><strong>${step.label}：</strong>${fmt(step.value)}，
+    ${i > 0 ? `环节转化率 ${rate}%，` : ''}整体转化率 ${overallRate}%</li>`;
   }
   
-  if (agg.clickRate < 3) {
-    suggestionsHTML += '<li><strong>提升点击率：</strong>优化广告创意素材，突出门店特色和优惠活动，A/B测试不同文案效果。</li>';
+  // 漏斗瓶颈分析
+  const clickToViewRate = agg.clicks > 0 ? (agg.merchantViews / agg.clicks * 100) : 0;
+  const viewToLeadRate = agg.merchantViews > 0 ? (totalLeads / agg.merchantViews * 100) : 0;
+  
+  section3 += `</ul><p style="margin-top:16px"><strong>漏斗瓶颈分析：</strong></p><ul>`;
+  
+  if (exposureToClickRate < 3) {
+    section3 += `<li><span class="highlight-down">曝光→点击环节转化偏低（${fmtPct(exposureToClickRate)}）：</span>这是当前最大瓶颈，说明广告创意未能有效吸引目标用户点击。建议优化广告标题、图片和文案，突出门店核心优势和差异化卖点。</li>`;
+  }
+  if (clickToViewRate < 200) {
+    section3 += `<li><span class="highlight-down">点击→浏览环节需关注（${fmtPct(clickToViewRate)}）：</span>用户点击后未深入浏览门店页面，可能是落地页加载慢或内容与广告预期不符。建议优化页面加载速度和内容相关性。</li>`;
+  }
+  if (viewToLeadRate < 1 && totalLeads > 0) {
+    section3 += `<li><span class="highlight-down">浏览→客资转化偏低（${fmtPct(viewToLeadRate)}）：</span>用户浏览了门店但未留下联系方式，说明转化引导不够强。建议在页面增加更多咨询入口、优惠活动和行动号召按钮。</li>`;
+  }
+  if (totalLeads === 0) {
+    section3 += `<li><span class="highlight-down">客资转化完全断裂：</span>从浏览到客资的转化率为零，这是最严重的问题。需要全面排查转化链路，包括咨询入口可见性、客服响应速度、页面行动引导等。</li>`;
+  }
+  section3 += '</ul></div>';
+  
+  // ===== 四、综合评估与优化建议 =====
+  let section4 = `
+    <div class="report-section">
+      <h3>四、综合评估与优化建议</h3>
+      <p><strong>本月综合评分：</strong>
+      ${clickRate >= 4 && totalLeads >= 20 && leadCost < 300 ? '<span class="highlight-up">优秀</span> — 推广效率高，转化效果好' :
+        clickRate >= 2.5 && totalLeads >= 10 ? '<span class="highlight">良好</span> — 整体表现正常，有优化空间' :
+        totalLeads > 0 ? '<span style="color:var(--warn);font-weight:700">一般</span> — 部分指标需重点关注' :
+        '<span class="highlight-down">需改进</span> — 转化链路存在明显问题'}
+      </p>
+      
+      <p style="margin-top:16px"><strong>针对性优化建议：</strong></p>
+      <ul>
+  `;
+  
+  // 根据实际数据生成建议
+  const suggestions = [];
+  
+  if (clickAvgPrice > 10) {
+    suggestions.push(`<li><strong>降低点击成本（当前¥${clickAvgPrice.toFixed(2)}）：</strong>
+    ① 优化关键词出价，降低高成本低效词的预算 ② 增加长尾关键词投放，获取更精准的低价流量 
+    ③ 提升广告质量分，通过优化创意和相关性降低实际点击成本 ④ 分析高成本时段，调整投放时间策略。</li>`);
   }
   
-  if (agg.customerLeads === 0 || agg.leadCost > 500) {
-    suggestionsHTML += '<li><strong>优化转化链路：</strong>检查落地页加载速度和转化引导，优化咨询话术，提升客资转化率。</li>';
+  if (clickRate < 3) {
+    suggestions.push(`<li><strong>提升点击率（当前${fmtPct(clickRate)}）：</strong>
+    ① A/B测试不同广告创意（图片+文案组合），找出最优方案 ② 突出门店核心优势（如医生资质、设备先进性、案例效果）
+    ③ 加入限时优惠或活动信息增加紧迫感 ④ 优化投放人群定向，确保广告展示给真正有需求的用户。</li>`);
   }
   
-  if (agg.onlineConsultClicks < 10) {
-    suggestionsHTML += '<li><strong>加强咨询引导：</strong>在页面显著位置增加咨询入口，设置自动回复话术，提升在线咨询量。</li>';
+  if (totalLeads < 15 && totalLeads > 0) {
+    suggestions.push(`<li><strong>提升客资转化（当前${fmt(totalLeads)}个）：</strong>
+    ① 在落地页首屏增加醒目的咨询入口和预约按钮 ② 设置在线客服自动回复，确保30秒内响应 
+    ③ 推出限时免费体验或低价体验项目降低决策门槛 ④ 增加真实案例和客户评价增强信任感。</li>`);
   }
   
-  suggestionsHTML += '<li><strong>关注评价管理：</strong>鼓励满意客户留下好评，及时回复负面评价，提升门店口碑。</li>';
-  suggestionsHTML += '<li><strong>数据分析常态化：</strong>建议每周复盘数据趋势，及时发现问题并调整策略。</li>';
-  suggestionsHTML += '</ul></div>';
+  if (totalLeads === 0) {
+    suggestions.push(`<li><strong>紧急修复客资转化（当前0个）：</strong>
+    ① 立即检查咨询入口是否正常显示和工作 ② 确认客服在线时间和响应机制 ③ 在页面增加多个转化触点（电话、微信、表单）
+    ④ 设置自动弹窗引导用户咨询 ⑤ 考虑增加限时优惠活动刺激用户行动。</li>`);
+  }
   
-  container.innerHTML = headerHTML + summaryHTML + promotionHTML + trafficHTML + suggestionsHTML;
+  if (agg.onlineConsultClicks < 20) {
+    suggestions.push(`<li><strong>加强在线咨询引导（当前${fmt(agg.onlineConsultClicks)}次）：</strong>
+    ① 在页面右下角增加浮动咨询按钮 ② 设置咨询自动欢迎语和常见问题快捷回复 
+    ③ 在商品详情页增加"立即咨询"按钮 ④ 培训客服提升咨询转化话术。</li>`);
+  }
+  
+  if (agg.reviewViews < 50) {
+    suggestions.push(`<li><strong>提升评价曝光（当前${fmt(agg.reviewViews)}次浏览）：</strong>
+    ① 鼓励满意客户留下详细好评 ② 及时回复所有评价（包括负面评价）展示服务态度 
+     在广告中引用优质评价内容 ④ 定期策划评价活动增加评价数量。</li>`);
+  }
+  
+  if (agg.prepaidOrderQty < 5) {
+    suggestions.push(`<li><strong>提升预付商品转化（当前${fmt(agg.prepaidOrderQty)}单）：</strong>
+     优化商品标题和描述，突出核心卖点 ② 设置合理的预付价格（建议为原价的3-5折）
+    ③ 增加商品展示图和案例效果图 ④ 在推广通中增加商品曝光权重。</li>`);
+  }
+  
+  // 通用建议
+  suggestions.push(`<li><strong>数据监控常态化：</strong>建议每日关注核心指标（花费、曝光、点击、客资），每周做一次数据复盘，及时发现异常并调整策略。</li>`);
+  suggestions.push(`<li><strong>竞品分析：</strong>定期关注同区域竞品的推广策略和价格水平，保持竞争优势。</li>`);
+  
+  section4 += suggestions.join('');
+  section4 += '</ul></div>';
+  
+  // ===== 组装完整报告 =====
+  container.innerHTML = headerHTML + section1 + section2 + section3 + section4;
 }
 
 // ============ 事件绑定 ============
